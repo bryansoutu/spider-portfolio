@@ -240,3 +240,44 @@ test("os projetos no ar têm destaque maior que os demais", async ({ page }) => 
     `destaque ${Math.round(alturaDestaque)}px vs compacta ${Math.round(alturaCompacta)}px`
   ).toBeGreaterThan(alturaCompacta);
 });
+
+test("o link compartilhado leva a marca do Bryan, não a da hospedagem", async ({
+  page,
+  request,
+}) => {
+  /*
+   * Regressão de 28/08: colar o link no WhatsApp mostrava o ícone da Vercel.
+   *
+   * A causa era ausência, não erro: sem `og:image`, cada plataforma escolhe
+   * sozinha o que exibir, e o que estava à mão era o ícone da hospedagem. O
+   * link de um portfólio chegava com a marca de quem hospeda no lugar da do
+   * dono — e ninguém percebe programando, porque isso só acontece do lado de
+   * fora, no servidor do WhatsApp.
+   */
+  await page.goto("/");
+
+  const meta = async (prop: string) =>
+    page.locator(`meta[property="${prop}"], meta[name="${prop}"]`).getAttribute("content");
+
+  expect(await meta("og:title")).toBeTruthy();
+  expect(await meta("og:description")).toBeTruthy();
+  expect(await meta("og:image:width")).toBe("1200");
+  expect(await meta("og:image:height")).toBe("630");
+  expect(await meta("og:image:alt")).toBeTruthy();
+
+  /*
+   * ABSOLUTA. As plataformas leem esta página pelo servidor delas, sem
+   * contexto nenhum — caminho relativo simplesmente não resolve, e o resultado
+   * é a mesma tela sem imagem de antes.
+   */
+  for (const prop of ["og:image", "og:url", "twitter:image"]) {
+    const v = await meta(prop);
+    expect(v, `${prop} precisa ser URL absoluta`).toMatch(/^https:\/\//);
+  }
+
+  // E o arquivo tem de existir de verdade, no tamanho que as tags prometem.
+  const r = await request.get("/og.png");
+  expect(r.status()).toBe(200);
+  expect(r.headers()["content-type"]).toContain("image/png");
+  expect((await r.body()).length).toBeGreaterThan(20_000);
+});

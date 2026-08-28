@@ -12,6 +12,7 @@
     "check:headers": "node scripts/check-headers.mjs",
     "images": "node scripts/optimize-images.mjs",
     "favicon": "node scripts/make-favicon.mjs",
+    "og": "node scripts/make-og.mjs",
     "resume:pdf": "vite build && node scripts/resume-pdf.mjs"
   },
   "dependencies": {

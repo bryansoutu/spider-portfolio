@@ -34,7 +34,39 @@
       content="Desenvolvimento web, interfaces e projetos criativos."
     />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Bryan Souto" />
+    <meta property="og:locale" content="pt_BR" />
+
+    <!--
+      A IMAGEM DE COMPARTILHAMENTO.
+
+      Sem ela, cada plataforma escolhe sozinha o que mostrar quando alguém cola
+      o link — e o que estava aparecendo era o ícone da Vercel, porque era o que
+      elas achavam. O link de um portfólio chegava com a marca da hospedagem no
+      lugar da do dono.
+
+      A URL precisa ser ABSOLUTA: WhatsApp, LinkedIn e Telegram leem esta página
+      pelo servidor deles, sem contexto nenhum, e caminho relativo não resolve.
+
+      Ao trocar de domínio, os três endereços daqui precisam mudar junto — é o
+      único lugar do site onde o endereço está escrito à mão.
+
+      `npm run og` regera a imagem a partir de `scripts/make-og.mjs`.
+    -->
+    <meta property="og:url" content="https://bryansoutodev.vercel.app/" />
+    <meta property="og:image" content="https://bryansoutodev.vercel.app/og.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Bryan Souto, desenvolvedor full-stack — 2 produtos no ar, 112 testes automatizados, 98 de PageSpeed"
+    />
+
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://bryansoutodev.vercel.app/og.png" />
+
+    <link rel="canonical" href="https://bryansoutodev.vercel.app/" />
 
     <!--
       NÃO existe script inline nesta página, e isso é proposital.
