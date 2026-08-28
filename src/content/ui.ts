@@ -37,7 +37,10 @@ export const ui = {
     },
     stats: {
       produtos: { "pt-BR": "produtos no ar", en: "products live" },
-      idiomas: { "pt-BR": "idiomas publicados", en: "languages shipped" },
+      testes: {
+        "pt-BR": "testes automatizados",
+        en: "automated tests",
+      },
       pagespeed: { "pt-BR": "PageSpeed no celular", en: "PageSpeed on mobile" },
     },
   },

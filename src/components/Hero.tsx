@@ -20,9 +20,28 @@ import maskAsset from "@/assets/spider-mask.webp";
  * aquela imagem respondia. Agora há uma linha embaixo dela — interação que
  * ninguém descobre é código que não faz nada.
  */
+/*
+ * Os três números que respondem, antes da pergunta, o que o recrutador quer
+ * saber nos primeiros segundos: essa pessoa entrega? com que cuidado?
+ *
+ * "4 idiomas publicados" ficou aqui até 28/08 e saiu por AMBIGUIDADE, não por
+ * ser falso. Colado em "2 produtos no ar", ele se lia como atributo pessoal —
+ * "fala 4 idiomas" — e o currículo, três telas abaixo, diz português nativo e
+ * inglês intermediário. O número existia para gerar confiança e gastava
+ * confiança. A informação continua no site, com contexto, dentro do case da
+ * NYO, onde ninguém confunde.
+ *
+ * Os 112 testes foram contados nos repositórios em 28/08/2026: 74 casos na
+ * Meteoros (67 unitários + 7 de ponta a ponta) e 38 neste portfólio, que
+ * rodam em dois formatos e dão 76 execuções. A NYO não tem testes, e por isso
+ * não entra na conta.
+ *
+ * Ao mexer nestes números: conferir de novo, não estimar. É o primeiro lugar
+ * onde alguém percebe que um portfólio arredonda para cima.
+ */
 const STATS = [
   { value: "2", label: ui.hero.stats.produtos },
-  { value: "4", label: ui.hero.stats.idiomas },
+  { value: "112", label: ui.hero.stats.testes },
   { value: "95", label: ui.hero.stats.pagespeed },
 ] as const;
 
