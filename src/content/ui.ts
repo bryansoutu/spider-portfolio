@@ -31,6 +31,10 @@ export const ui = {
       "pt-BR": "Passe o mouse — ou toque",
       en: "Hover — or tap",
     },
+    portraitHintTouch: {
+      "pt-BR": "Toque para trocar",
+      en: "Tap to switch",
+    },
     portraitToggle: {
       "pt-BR": "Alternar entre a foto e a máscara",
       en: "Switch between the photo and the mask",

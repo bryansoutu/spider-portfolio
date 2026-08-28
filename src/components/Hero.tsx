@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { profile } from "@/content/profile";
 import { ui } from "@/content/ui";
@@ -50,8 +50,38 @@ export function Hero() {
   const [hover, setHover] = useState(false);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const portraitRef = useRef<HTMLButtonElement>(null);
-  /* Qual ponteiro encostou por último: separa dedo de mouse no clique. */
-  const ultimoPonteiro = useRef<string>("mouse");
+
+  /*
+   * O aparelho tem mouse de verdade?
+   *
+   * Esta pergunta substituiu a anterior, que era "de que tipo é este
+   * ponteiro?". A troca aconteceu porque a resposta antiga funcionava no
+   * emulador e falhava em celular de verdade: `pointerType` no evento de
+   * clique vem "touch" em um navegador, "" em outro, e alguns ainda disparam
+   * eventos de mouse por compatibilidade depois do toque. Era um guarda que
+   * dependia de detalhe de implementação de cada navegador.
+   *
+   * `(hover: hover) and (pointer: fine)` é a consulta que os navegadores
+   * existem para responder, e é a mesma que o CSS usa. Celular responde não;
+   * computador com mouse responde sim. A partir daí só há dois caminhos, e
+   * nenhum depende de adivinhar o tipo do evento.
+   *
+   * Fica num estado que escuta mudanças: quem liga um mouse num tablet muda de
+   * caminho sem recarregar a página.
+   */
+  const [temHover, setTemHover] = useState(
+    () =>
+      typeof window === "undefined" ||
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const ler = () => setTemHover(mq.matches);
+    ler();
+    mq.addEventListener("change", ler);
+    return () => mq.removeEventListener("change", ler);
+  }, []);
 
   return (
     <section
@@ -107,51 +137,45 @@ export function Hero() {
           aria-pressed={hover}
           aria-label={t(ui.hero.portraitToggle)}
           /*
-           * Os três eventos abaixo valem SÓ para o mouse.
-           *
-           * O navegador dispara eventos de ponteiro de mouse também no toque,
-           * por compatibilidade com sites antigos. Um toque virava
-           * `pointerenter` (liga a máscara) seguido de `click` (alterna de
-           * volta): piscava e não mudava nada.
+           * Só quem tem mouse recebe o efeito de passagem e o relevo. Num
+           * aparelho de toque estes três nem são registrados — não há o que
+           * brigar com o clique.
            */
-          onPointerMove={(e) => {
-            if (e.pointerType !== "mouse") return;
-            const el = portraitRef.current;
-            if (!el) return;
-            const r = el.getBoundingClientRect();
-            setTilt({
-              x: ((e.clientY - r.top) / r.height - 0.5) * -14,
-              y: ((e.clientX - r.left) / r.width - 0.5) * 14,
-            });
-          }}
-          onPointerEnter={(e) => {
-            if (e.pointerType === "mouse") setHover(true);
-          }}
-          onPointerLeave={(e) => {
-            if (e.pointerType !== "mouse") return;
-            setHover(false);
-            setTilt({ x: 0, y: 0 });
-          }}
-          onPointerDown={(e) => {
-            ultimoPonteiro.current = e.pointerType;
-          }}
+          onPointerMove={
+            temHover
+              ? (e) => {
+                  const el = portraitRef.current;
+                  if (!el) return;
+                  const r = el.getBoundingClientRect();
+                  setTilt({
+                    x: ((e.clientY - r.top) / r.height - 0.5) * -14,
+                    y: ((e.clientX - r.left) / r.width - 0.5) * 14,
+                  });
+                }
+              : undefined
+          }
+          onPointerEnter={temHover ? () => setHover(true) : undefined}
+          onPointerLeave={
+            temHover
+              ? () => {
+                  setHover(false);
+                  setTilt({ x: 0, y: 0 });
+                }
+              : undefined
+          }
           /*
            * O clique alterna e FICA — o "toca e muda, toca de novo e muda"
-           * que se espera no celular. Com mouse ele não faz nada, senão
-           * desfaria no primeiro clique o que a passagem acabou de fazer.
+           * que se espera no celular.
            *
-           * O tipo vem do PRÓPRIO evento, não do último ponteiro guardado. É
-           * o que faz o teclado funcionar: o clique sintético do Enter tem
-           * `pointerType` vazio, enquanto o ref ainda diria "mouse" — nenhum
-           * ponteiro encostou. O ref fica como reserva para navegador que não
-           * entrega `pointerType` no clique.
+           * `detail === 0` identifica o clique vindo do TECLADO: o Enter num
+           * botão gera um clique sintético, e sintético não tem contagem de
+           * cliques. Sem essa condição, quem navega por teclado num
+           * computador não conseguiria acionar o retrato, porque o caminho do
+           * mouse ignora o clique de propósito.
            */
           onClick={(e) => {
-            const tipo =
-              "pointerType" in e.nativeEvent
-                ? (e.nativeEvent as PointerEvent).pointerType
-                : ultimoPonteiro.current;
-            if (tipo !== "mouse") setHover((v) => !v);
+            const doTeclado = e.detail === 0;
+            if (!temHover || doTeclado) setHover((v) => !v);
           }}
           className={`portrait-ring sem-toque-longo group relative mt-8 h-[clamp(13rem,24vw,22rem)] w-[clamp(13rem,24vw,22rem)] ${hover ? "mask-glow" : ""}`}
           style={{
@@ -211,7 +235,7 @@ export function Hero() {
             hover ? "text-web-strong" : "text-muted-foreground/70"
           }`}
         >
-          {t(ui.hero.portraitHint)}
+          {t(temHover ? ui.hero.portraitHint : ui.hero.portraitHintTouch)}
         </p>
 
         <h1

@@ -31,19 +31,43 @@ test("no toque, alterna e fica — e alterna de volta no toque seguinte", async 
   await page.getByRole("heading", { level: 1 }).waitFor();
 
   const botao = retrato(page);
-  await expect(botao).toHaveAttribute("aria-pressed", "false");
+
+  /*
+   * A asserção é sobre a IMAGEM, não sobre o estado.
+   *
+   * A versão anterior deste teste conferia só o `aria-pressed`, e por isso
+   * passou verde enquanto o Bryan via, no celular dele, a foto não trocar. O
+   * estado do React pode estar certíssimo e a máscara continuar invisível.
+   * O que interessa é o pixel.
+   */
+  const opacidades = () =>
+    page.evaluate(() => {
+      const b = document.querySelector('[aria-label*="Alternar"], [aria-label*="Switch"]')!;
+      const [face, mask] = b.querySelectorAll("img");
+      return {
+        rosto: Number(getComputedStyle(face!).opacity),
+        mascara: Number(getComputedStyle(mask!).opacity),
+      };
+    });
+
+  const inicio = await opacidades();
+  expect(inicio.rosto).toBeGreaterThan(0.9);
+  expect(inicio.mascara).toBeLessThan(0.1);
 
   await botao.tap();
-  await expect(
-    botao,
-    "o primeiro toque não ligou a máscara (mouse e toque brigando?)"
-  ).toHaveAttribute("aria-pressed", "true");
+  await page.waitForTimeout(800);
 
-  await botao.tap();
-  await expect(botao).toHaveAttribute("aria-pressed", "false");
-
-  await botao.tap();
+  const depois = await opacidades();
+  expect(depois.mascara, "a máscara não apareceu ao tocar").toBeGreaterThan(0.9);
+  expect(depois.rosto, "a foto não saiu ao tocar").toBeLessThan(0.1);
   await expect(botao).toHaveAttribute("aria-pressed", "true");
+
+  await botao.tap();
+  await page.waitForTimeout(800);
+
+  const voltou = await opacidades();
+  expect(voltou.mascara, "a máscara não saiu no segundo toque").toBeLessThan(0.1);
+  expect(voltou.rosto).toBeGreaterThan(0.9);
 
   await ctx.close();
 });
@@ -94,4 +118,25 @@ test("o retrato é alcançável e acionável pelo teclado", async ({ page }) => 
 
   await page.keyboard.press("Enter");
   await expect(botao).toHaveAttribute("aria-pressed", "true");
+});
+
+test("num aparelho de toque a dica não manda passar o mouse", async ({ browser }) => {
+  const ctx = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    hasTouch: true,
+    isMobile: true,
+  });
+  const page = await ctx.newPage();
+  await page.goto("/?lang=pt-BR");
+  await page.getByRole("heading", { level: 1 }).waitFor();
+
+  /*
+   * Quem está no celular não tem mouse para passar. A mesma consulta que
+   * decide o modo de interação decide o texto — se os dois discordarem, um
+   * dos dois está mentindo.
+   */
+  await expect(page.getByText(/toque para trocar/i)).toBeVisible();
+  await expect(page.getByText(/passe o mouse/i)).toHaveCount(0);
+
+  await ctx.close();
 });
