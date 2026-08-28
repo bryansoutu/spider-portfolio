@@ -119,8 +119,8 @@ export const projects: Project[] = [
     },
     outcome: {
       "pt-BR":
-        "No ar e bilíngue, com o idioma escolhido pelo navegador de quem chega. O retrato saiu de 5,9 MB para 71 KB (o mesmo círculo de 320px na tela), o contraste do vermelho foi medido antes de entrar, o teclado enxerga o foco em todo elemento clicável e todo o movimento desliga sob prefers-reduced-motion. O código está aberto — é o próprio case.",
-      en: "Live and bilingual, picking the language from the visitor's browser. The portrait went from 5.9 MB to 71 KB (same 320px circle on screen), the red's contrast was measured before it shipped, focus is visible on every clickable element, and all motion switches off under prefers-reduced-motion. The source is open — it is the case study.",
+        "No ar e bilíngue, com seletor de idioma no cabeçalho. O retrato saiu de 5,9 MB para 71 KB (o mesmo círculo de 320px na tela), o contraste do vermelho foi medido antes de entrar, o teclado enxerga o foco em todo elemento clicável e todo o movimento desliga sob prefers-reduced-motion. São 38 testes de ponta a ponta rodando em desktop e celular contra o build de produção, e cada um deles tranca um defeito que este site já teve. A política de segurança recusa script inline e script de terceiro, e um script confere os cabeçalhos no ar a cada publicação. O código está aberto — é o próprio case.",
+      en: "Live and bilingual, with a language switch in the header. The portrait went from 5.9 MB to 71 KB (same 320px circle on screen), the red's contrast was measured before it shipped, focus is visible on every clickable element, and all motion switches off under prefers-reduced-motion. There are 38 end-to-end tests running on desktop and mobile against the production build, each one locking down a defect this site actually had. The security policy refuses inline and third-party scripts, and a script checks the live headers on every release. The source is open — it is the case study.",
     },
     stack: ["Vite", "React 19", "TypeScript", "Tailwind CSS 4", "Canvas 2D"],
     /*
