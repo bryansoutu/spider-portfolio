@@ -1,0 +1,324 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using oklch.
+ * All colors MUST use oklch format.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  --radius: 0.25rem;
+  --background: oklch(0.06 0 0);
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.1 0 0);
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.1 0 0);
+  --popover-foreground: oklch(0.98 0 0);
+  --primary: oklch(0.98 0 0);
+  --primary-foreground: oklch(0.06 0 0);
+  --secondary: oklch(0.16 0 0);
+  --secondary-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.16 0 0);
+  --muted-foreground: oklch(0.66 0 0);
+  --accent: oklch(0.2 0 0);
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.55 0.2 27);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(1 0 0 / 14%);
+  --input: oklch(1 0 0 / 18%);
+  --ring: oklch(0.7 0 0);
+  --chart-1: oklch(0.98 0 0);
+  --chart-2: oklch(0.8 0 0);
+  --chart-3: oklch(0.6 0 0);
+  --chart-4: oklch(0.4 0 0);
+  --chart-5: oklch(0.25 0 0);
+  --sidebar: oklch(0.08 0 0);
+  --sidebar-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.98 0 0);
+  --sidebar-primary-foreground: oklch(0.06 0 0);
+  --sidebar-accent: oklch(0.16 0 0);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(1 0 0 / 14%);
+  --sidebar-ring: oklch(0.7 0 0);
+}
+
+
+.dark {
+  --background: oklch(0.129 0.042 264.695);
+  --foreground: oklch(0.984 0.003 247.858);
+  --card: oklch(0.208 0.042 265.755);
+  --card-foreground: oklch(0.984 0.003 247.858);
+  --popover: oklch(0.208 0.042 265.755);
+  --popover-foreground: oklch(0.984 0.003 247.858);
+  --primary: oklch(0.929 0.013 255.508);
+  --primary-foreground: oklch(0.208 0.042 265.755);
+  --secondary: oklch(0.279 0.041 260.031);
+  --secondary-foreground: oklch(0.984 0.003 247.858);
+  --muted: oklch(0.279 0.041 260.031);
+  --muted-foreground: oklch(0.704 0.04 256.788);
+  --accent: oklch(0.279 0.041 260.031);
+  --accent-foreground: oklch(0.984 0.003 247.858);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.551 0.027 264.364);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.208 0.042 265.755);
+  --sidebar-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.279 0.041 260.031);
+  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.551 0.027 264.364);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+}
+
+@utility reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+
+  &.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility link-web {
+  position: relative;
+  transition: opacity 0.2s ease;
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    height: 1px;
+    width: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  &:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+@utility portrait-ring {
+  border-radius: 9999px;
+  transition: transform 0.2s ease-out, box-shadow 0.4s ease;
+  box-shadow:
+    0 0 0 1px var(--color-border),
+    0 0 60px -10px oklch(1 0 0 / 25%);
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -14%;
+    border-radius: 9999px;
+    background:
+      repeating-conic-gradient(from 0deg, oklch(1 0 0 / 12%) 0deg 0.4deg, transparent 0.4deg 45deg),
+      radial-gradient(circle, transparent 55%, oklch(1 0 0 / 8%) 56%, transparent 57%),
+      radial-gradient(circle, transparent 68%, oklch(1 0 0 / 8%) 69%, transparent 70%),
+      radial-gradient(circle, transparent 80%, oklch(1 0 0 / 8%) 81%, transparent 82%);
+    pointer-events: none;
+    animation: spin 40s linear infinite;
+  }
+}
+
+/* Glow vermelho sutil quando a máscara aparece — referência ao Homem-Aranha */
+@utility mask-glow {
+  box-shadow:
+    0 0 0 1px oklch(0.6 0.22 27 / 40%),
+    0 0 80px -8px oklch(0.6 0.22 27 / 35%);
+}
+
+/* Marquee infinito para a faixa de skills */
+@utility marquee {
+  animation: marquee-scroll 28s linear infinite;
+}
+
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/*
+ * Impressão — e, pelo mesmo caminho, o PDF do currículo.
+ *
+ * O site é uma página só, então imprimir "a página" traria hero, projetos e
+ * rodapé junto. A saída é tirar do fluxo tudo que não é o currículo.
+ *
+ * A primeira versão escondia com `visibility: hidden` e promovia o currículo
+ * para `position: absolute`. Funcionava na tela — e imprimia oito páginas em
+ * branco depois do documento, porque elemento invisível continua ocupando
+ * altura. `display: none` remove do fluxo, e a altura da folha passa a ser a
+ * altura do currículo.
+ */
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm 14mm 12mm;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /*
+   * O `div` raiz continua na página (é ele que contém o currículo) e carrega
+   * `bg-background`, que é quase preto. Sem zerar o fundo dos containers, o
+   * papel sai preto com texto preto em cima — invisível, e só descoberto por
+   * quem imprimir.
+   */
+  #root,
+  #root div,
+  #root main,
+  #root section {
+    background: transparent !important;
+  }
+
+  /*
+   * Fundo animado, cabeçalho e rodapé do site não existem no papel.
+   *
+   * O seletor é ancorado no topo da árvore de propósito. Um `header` solto
+   * pegava também o `<header>` de identificação DENTRO do currículo — e o
+   * documento saía impresso sem nome, sem e-mail e sem telefone, que é
+   * exatamente a informação que ele existe para carregar.
+   */
+  canvas,
+  #root > div > header,
+  #root > div > footer {
+    display: none !important;
+  }
+
+  /* Das seções, sobra uma. */
+  main > *:not(.resume-print) {
+    display: none !important;
+  }
+
+  .resume-print {
+    max-width: none;
+    padding: 0;
+  }
+
+  .resume-print * {
+    color: #000 !important;
+    border-color: #00000026 !important;
+  }
+
+  /*
+   * O reveal esconde o elemento até o observador marcá-lo como visível. Na
+   * impressão nada rola, então metade do currículo sairia em branco — o
+   * defeito mais silencioso que existe, porque só aparece no papel.
+   */
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Nenhum bloco do currículo deve nascer no fim de uma página. */
+  h3,
+  h4,
+  li {
+    break-inside: avoid;
+  }
+}
+
+/*
+ * Rede de segurança do efeito de entrada.
+ *
+ * `.reveal` nasce com opacidade 0 e só acende quando o IntersectionObserver
+ * marca o elemento. São dois jeitos de isso nunca acontecer, e nos dois o
+ * visitante fica olhando para uma página em branco:
+ *
+ *   1. O JavaScript não roda (bloqueado, erro no bundle, rede ruim).
+ *   2. O observer existe mas nunca dispara — o Chrome o congela em aba de
+ *      segundo plano, por exemplo.
+ *
+ * O primeiro caso é resolvido pela classe `js-reveal`, escrita no <head>
+ * antes da primeira pintura: sem JS ela não existe e nada é escondido. O
+ * segundo é resolvido no App, com um prazo depois do qual o que já está na
+ * tela aparece de qualquer jeito.
+ */
+html:not(.js-reveal) .reveal {
+  opacity: 1 !important;
+  transform: none !important;
+}

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+
+    <!-- Os metadados vinham do `head()` do __root.tsx no Lovable, que dizia
+         "Lovable App / Lovable Generated Project". Aqui viraram os do Bryan. -->
+    <title>Bryan Souto — Portfólio</title>
+    <meta
+      name="description"
+      content="Portfólio de Bryan Souto: desenvolvimento web, interfaces e projetos criativos em preto e branco."
+    />
+    <meta name="author" content="Bryan Souto" />
+    <meta property="og:title" content="Bryan Souto — Portfólio" />
+    <meta
+      property="og:description"
+      content="Desenvolvimento web, interfaces e projetos criativos."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!--
+      Marca que o JavaScript está vivo, antes da primeira pintura. O CSS só
+      esconde os elementos de entrada quando esta classe existe — sem JS, a
+      página nasce legível em vez de invisível para sempre.
+    -->
+    <script>
+      document.documentElement.classList.add("js-reveal");
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
