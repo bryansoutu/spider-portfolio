@@ -59,6 +59,9 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-web: var(--web);
+  --color-web-strong: var(--web-strong);
+  --color-web-dim: var(--web-dim);
 }
 
 :root {
@@ -74,7 +77,28 @@
   --secondary: oklch(0.16 0 0);
   --secondary-foreground: oklch(0.98 0 0);
   --muted: oklch(0.16 0 0);
-  --muted-foreground: oklch(0.66 0 0);
+  --muted-foreground: oklch(0.78 0 0);
+
+  /*
+   * O vermelho da aranha — a única cor do site.
+   *
+   * Ele já existia aqui, escondido no brilho da máscara do hero. Virou token
+   * porque destaque espalhado à mão vira cinco vermelhos diferentes na
+   * terceira seção.
+   *
+   * São três variantes porque o mesmo vermelho não serve para as três coisas:
+   *
+   *   --web-strong  texto e ícones. L=0.72 dá 6.4:1 contra o fundo quase
+   *                 preto, acima do 4.5:1 que a WCAG pede para texto pequeno.
+   *                 O valor cheio (L=0.62) fica em 4.8:1 — passa raspando, e
+   *                 raspar não é margem em tela de celular no sol.
+   *   --web         traço, borda e a teia do fundo, onde não há texto para ler.
+   *   --web-dim     estados de repouso e brilhos, sempre por baixo de outra
+   *                 coisa.
+   */
+  --web: oklch(0.62 0.21 25);
+  --web-strong: oklch(0.72 0.19 25);
+  --web-dim: oklch(0.62 0.21 25 / 30%);
   --accent: oklch(0.2 0 0);
   --accent-foreground: oklch(0.98 0 0);
   --destructive: oklch(0.55 0.2 27);
@@ -157,29 +181,6 @@
   }
 }
 
-@utility link-web {
-  position: relative;
-  transition: opacity 0.2s ease;
-
-  &::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -2px;
-    height: 1px;
-    width: 100%;
-    background: currentColor;
-    transform: scaleX(0);
-    transform-origin: right;
-    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  &:hover::after {
-    transform: scaleX(1);
-    transform-origin: left;
-  }
-}
-
 @utility portrait-ring {
   border-radius: 9999px;
   transition: transform 0.2s ease-out, box-shadow 0.4s ease;
@@ -217,6 +218,184 @@
 @keyframes marquee-scroll {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
+}
+
+/*
+ * Rótulo mono — o texto miúdo e espaçado que o site usa para tudo que não é
+ * corpo: navegação, categorias, datas, status.
+ *
+ * Ele estava escrito à mão em dezenove lugares como
+ * `text-[0.65rem] tracking-[0.3em]`, e era a queixa principal do Bryan: difícil
+ * de ler. Dois motivos somados, nenhum deles a cor sozinha. 0.65rem dá 10,4px,
+ * abaixo dos 12px em que a maioria dos navegadores ainda desenha traço fino de
+ * forma decente; e 0.3em de espaçamento em caixa alta separa tanto as letras
+ * que o olho para de ler a palavra e passa a soletrar.
+ *
+ * Aqui vira uma coisa só: 12px e 0.16em. Continua sendo o mesmo gesto de
+ * design, mas legível — e mudar de ideia sobre ele agora é mudar um valor.
+ */
+@utility label {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+@utility label-sm {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.7rem;
+  line-height: 1.4;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/*
+ * Um sublinhado que se tece da direita para a esquerda. Agora em vermelho: é
+ * o sinal de "isto responde ao mouse" repetido em todo link do site.
+ */
+@utility link-web {
+  position: relative;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--web-strong);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    height: 1px;
+    width: 100%;
+    background: var(--web);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  &:hover::after,
+  &:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+/*
+ * Foco visível, uma vez, para o site inteiro.
+ *
+ * Metade dos elementos interativos daqui virou botão nesta passada (as seções
+ * que abrem). Sem isto, quem navega por Tab perde a posição no primeiro
+ * `<summary>` — e o anel padrão do Chrome é azul, a única cor que não existe
+ * neste site.
+ */
+:where(a, button, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--web-strong);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/*
+ * Bloco que abre.
+ *
+ * O `::-webkit-details-marker` some porque a seta padrão aparece só no
+ * Chromium — no Firefox o triângulo é outro elemento, e o resultado seria um
+ * marcador em metade dos navegadores. O indicador é desenhado no componente,
+ * igual em todos.
+ */
+summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+@keyframes disclosure-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * Rolagem horizontal sem a barra à mostra — o menu no celular. A barra
+ * ficaria por cima dos rótulos numa faixa de 44px de altura.
+ */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility disclosure-body {
+  animation: disclosure-in 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/*
+ * As pernas da aranha que anda pela tela.
+ *
+ * Os dois lados batem em contratempo (um começa no meio do ciclo pelo
+ * `-0.14s` de atraso negativo), que é o que separa "caminhada" de "objeto
+ * tremendo". A origem da rotação é o centro do corpo, senão cada perna gira
+ * em torno da própria ponta e o bicho se desmonta.
+ *
+ * E elas só se mexem quando ela está andando: parada com as pernas em
+ * movimento, seria um enfeite vibrando: `data-andando` é escrito pelo
+ * componente a cada quadro.
+ */
+@keyframes spider-step {
+  from {
+    transform: rotate(-7deg);
+  }
+  to {
+    transform: rotate(7deg);
+  }
+}
+
+.spider svg g {
+  transform-origin: 0 0;
+}
+
+.spider[data-andando="true"] .spider-legs-l {
+  animation: spider-step 0.34s ease-in-out infinite alternate;
+}
+
+.spider[data-andando="true"] .spider-legs-r {
+  animation: spider-step 0.34s ease-in-out -0.17s infinite alternate;
+}
+
+/*
+ * Respeitar quem pediu menos movimento.
+ *
+ * O site ganhou fundo animado, marquee, abertura e blocos que deslizam. Para
+ * quem sofre de enjoo de movimento isso não é enfeite: é motivo para fechar a
+ * aba. As animações somem; nada de conteúdo depende delas para aparecer, o que
+ * é justamente o que a regra abaixo garante ao forçar o `.reveal` aceso.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 /*
@@ -279,7 +458,18 @@
     padding: 0;
   }
 
-  .resume-print * {
+  /*
+   * Tudo preto no papel — inclusive o que é desenhado por pseudo-elemento.
+   *
+   * A regra pegava só `.resume-print *`, que casa com ELEMENTOS. Os travessões
+   * de cada item da experiência são `::before`, e o site ganhou uma cor: eles
+   * saíam vermelhos numa folha em preto e branco, junto com o traço do rótulo
+   * da seção. Currículo impresso em duas cores num escritório que imprime em
+   * mono vira travessão cinza-claro — ou some.
+   */
+  .resume-print *,
+  .resume-print *::before,
+  .resume-print *::after {
     color: #000 !important;
     border-color: #00000026 !important;
   }

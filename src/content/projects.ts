@@ -114,22 +114,15 @@ export const projects: Project[] = [
     },
     solution: {
       "pt-BR":
-        "Portfólio bilíngue construído com o mesmo rigor de um produto: requisitos escritos antes do código, paleta com contraste medido em vez de estimado, e conteúdo tipado de forma que uma tradução faltando quebra o build.",
-      en: "A bilingual portfolio built with the same rigor as a product: requirements written before any code, a palette with measured — not guessed — contrast, and typed content where a missing translation breaks the build.",
+        "Portfólio bilíngue em que o conteúdo é dado tipado, não texto solto no meio da tela: cada frase existe em português E inglês, e o compilador recusa o build se faltar uma tradução. O currículo é uma seção desta mesma página, e o PDF é impresso dela — não existe um segundo arquivo para desatualizar.",
+      en: "A bilingual portfolio where the content is typed data, not copy scattered through the markup: every sentence exists in Portuguese AND English, and the compiler refuses to build if a translation is missing. The résumé is a section of this same page, and the PDF is printed from it — there is no second file to fall out of date.",
     },
     outcome: {
       "pt-BR":
-        "Medi o contraste da paleta antes de escolhê-la: 2 dos tons clássicos do tema reprovaram em WCAG AA para texto e viraram só cor de fundo. Renderizado no servidor, legível sem JavaScript, com todo movimento desligado sob prefers-reduced-motion. O código está aberto — é o próprio case.",
-      en: "I measured the palette's contrast before committing to it: 2 of the theme's classic tones failed WCAG AA for text and became background-only colors. Server-rendered, readable without JavaScript, with every animation disabled under prefers-reduced-motion. The source is open — it is the case study.",
+        "No ar e bilíngue, com o idioma escolhido pelo navegador de quem chega. O retrato saiu de 5,9 MB para 71 KB (o mesmo círculo de 320px na tela), o contraste do vermelho foi medido antes de entrar, o teclado enxerga o foco em todo elemento clicável e todo o movimento desliga sob prefers-reduced-motion. O código está aberto — é o próprio case.",
+      en: "Live and bilingual, picking the language from the visitor's browser. The portrait went from 5.9 MB to 71 KB (same 320px circle on screen), the red's contrast was measured before it shipped, focus is visible on every clickable element, and all motion switches off under prefers-reduced-motion. The source is open — it is the case study.",
     },
-    stack: [
-      "Next.js 16",
-      "TypeScript",
-      "Tailwind CSS 4",
-      "next-intl",
-      "Vitest",
-      "Playwright",
-    ],
+    stack: ["Vite", "React 19", "TypeScript", "Tailwind CSS 4", "Canvas 2D"],
   },
 ];
 
