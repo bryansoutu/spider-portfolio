@@ -1,5 +1,7 @@
 import { test, expect } from "@playwright/test";
 
+import { abrirMenuSePreciso, itemDeMenu } from "./apoio";
+
 /**
  * Cabeçalho e navegação.
  *
@@ -22,8 +24,14 @@ test("o cabeçalho continua na tela durante a rolagem", async ({ page }) => {
     await page.evaluate((v) => window.scrollTo(0, v), y);
     await page.waitForTimeout(400);
 
+    /*
+     * `banner`, e não `header`. Existem dois `<header>` na página: o do site e
+     * o de identificação de dentro do currículo, que agora fica sempre no DOM
+     * para a impressão nunca sair em branco. Só o primeiro tem papel de
+     * banner — o outro está dentro de uma `<section>`.
+     */
     const topo = await page
-      .locator("header")
+      .getByRole("banner")
       .evaluate((el) => Math.round(el.getBoundingClientRect().top));
 
     expect(topo, `cabeçalho descolou com a página em ${y}px`).toBe(0);
@@ -35,7 +43,7 @@ test("o cabeçalho encolhe ao rolar e não oscila na fronteira", async ({ page }
   await page.getByRole("heading", { level: 1 }).waitFor();
 
   const altura = () =>
-    page.locator("header").evaluate((el) => Math.round(el.getBoundingClientRect().height));
+    page.getByRole("banner").evaluate((el) => Math.round(el.getBoundingClientRect().height));
 
   const noTopo = await altura();
 
@@ -71,7 +79,8 @@ test("clicar no menu leva à seção certa", async ({ page }) => {
    * o rodapé, então a página acaba antes de conseguir levá-la ao topo da tela.
    * O teste reprovava por causa do fim do documento, não do link.
    */
-  await page.getByRole("link", { name: "Projetos", exact: true }).click();
+  await abrirMenuSePreciso(page);
+  await itemDeMenu(page, "Projetos").click();
   await page.waitForTimeout(700);
 
   const caixa = await page
@@ -94,7 +103,8 @@ test("o item Início volta ao topo", async ({ page }) => {
   await page.evaluate(() => window.scrollTo(0, 3000));
   await page.waitForTimeout(400);
 
-  await page.getByRole("link", { name: "Início", exact: true }).click();
+  await abrirMenuSePreciso(page);
+  await itemDeMenu(page, "Início").click();
   await page.waitForTimeout(900);
 
   expect(await page.evaluate(() => window.scrollY)).toBeLessThan(200);

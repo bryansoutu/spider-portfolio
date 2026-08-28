@@ -20,7 +20,7 @@ export function Section({
   id,
   label,
   children,
-  className = "mx-auto w-full max-w-3xl scroll-mt-24 px-6 py-24 md:py-32 xl:max-w-4xl xl:px-8",
+  className = "mx-auto w-full max-w-3xl scroll-mt-24 px-6 py-16 sm:py-24 md:py-32 xl:max-w-4xl xl:px-8",
 }: {
   id: string;
   label: string;

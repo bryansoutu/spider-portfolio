@@ -39,7 +39,7 @@ export function Capabilities() {
     <Section
       id="faco"
       label={t(ui.nav.faco)}
-      className="mx-auto w-full max-w-4xl scroll-mt-24 px-6 py-24 md:py-32 xl:max-w-5xl xl:px-8 2xl:max-w-6xl"
+      className="mx-auto w-full max-w-4xl scroll-mt-24 px-6 py-16 sm:py-24 md:py-32 xl:max-w-5xl xl:px-8 2xl:max-w-6xl"
     >
       <ul className="mt-10 border-t border-border">
         {capabilities.map((capability, i) => (
@@ -177,7 +177,7 @@ export function Skills() {
     <Section
       id="habilidades"
       label={t(ui.nav.habilidades)}
-      className="mx-auto w-full max-w-4xl scroll-mt-24 px-6 py-24 md:py-32 xl:max-w-5xl xl:px-8 2xl:max-w-6xl"
+      className="mx-auto w-full max-w-4xl scroll-mt-24 px-6 py-16 sm:py-24 md:py-32 xl:max-w-5xl xl:px-8 2xl:max-w-6xl"
     >
       <div data-reveal className="reveal mt-10 flex flex-wrap items-center gap-2">
         <Chip ativo={categoria === "tudo"} onClick={() => setCategoria("tudo")}>

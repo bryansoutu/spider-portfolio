@@ -1,5 +1,7 @@
 import { test, expect } from "@playwright/test";
 
+import { abrirMenuSePreciso, itemDeMenu } from "./apoio";
+
 /**
  * Idioma.
  *
@@ -18,7 +20,8 @@ test("abre em português quando o navegador é pt-BR", async ({ browser }) => {
   await expect(page.locator("html")).toHaveAttribute("lang", "pt-BR");
   // `exact` porque o logo "BS" também aponta para o topo, com o rótulo
   // acessível "Voltar ao início".
-  await expect(page.getByRole("link", { name: "Início", exact: true })).toBeVisible();
+  await abrirMenuSePreciso(page);
+  await expect(itemDeMenu(page, "Início")).toBeVisible();
   await ctx.close();
 });
 
@@ -34,7 +37,8 @@ test("abre em inglês quando o navegador não é português", async ({ browser }
    * de decidir de fato.
    */
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
-  await expect(page.getByRole("link", { name: "Home", exact: true })).toBeVisible();
+  await abrirMenuSePreciso(page);
+  await expect(itemDeMenu(page, "Home")).toBeVisible();
   await ctx.close();
 });
 
@@ -52,12 +56,14 @@ test("o parâmetro ?lang= manda mais que o navegador", async ({ browser }) => {
 test("o seletor troca o idioma e a escolha sobrevive ao recarregar", async ({ page }) => {
   await page.goto("/?lang=pt-BR");
   await page.getByRole("heading", { level: 1 }).waitFor();
-  await expect(page.getByRole("link", { name: "Projetos" })).toBeVisible();
+  await abrirMenuSePreciso(page);
+  await expect(itemDeMenu(page, "Projetos")).toBeVisible();
 
   await page.getByRole("button", { name: "EN", exact: true }).click();
 
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
-  await expect(page.getByRole("link", { name: "Work" })).toBeVisible();
+  await abrirMenuSePreciso(page);
+  await expect(itemDeMenu(page, "Work")).toBeVisible();
   await expect(page.getByRole("button", { name: "EN", exact: true })).toHaveAttribute(
     "aria-pressed",
     "true"

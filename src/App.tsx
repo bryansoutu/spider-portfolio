@@ -147,6 +147,20 @@ function Pagina() {
    */
   const encerrarAbertura = useCallback(() => setLoading(false), []);
 
+  /*
+   * O menu do celular. Ele fecha sozinho quando a janela passa de 640px —
+   * senão, girar o aparelho deixa o painel aberto por cima de uma barra que
+   * já mostra os seis itens em linha, com o menu duplicado na tela.
+   */
+  const [menuAberto, setMenuAberto] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 640px)");
+    const fechar = () => mq.matches && setMenuAberto(false);
+    mq.addEventListener("change", fechar);
+    return () => mq.removeEventListener("change", fechar);
+  }, []);
+
   useEffect(() => {
     const els = document.querySelectorAll("[data-reveal]");
     const io = new IntersectionObserver(
@@ -221,55 +235,110 @@ function Pagina() {
        * A transição está em cada peça, e não num `height` no pai: animar
        * altura obriga o navegador a recalcular o layout da página inteira a
        * cada quadro, e é justamente durante a rolagem que ele menos tem sobra.
+       *
+       * NO CELULAR os seis itens não cabem: a faixa rolável cortava
+       * "HABILIDADES" no meio da palavra, o que se lê como layout quebrado e
+       * não como "arraste para o lado". Abaixo de 640px eles vão para um menu
+       * que abre — que também é o único jeito de o item ativo ser visível sem
+       * a pessoa ter de arrastar até ele.
        */}
       <header
-        className={`sticky top-0 z-30 flex items-center justify-between gap-4 bg-background/80 px-5 backdrop-blur-md transition-all duration-300 md:px-12 print:hidden ${
-          rolou
-            ? "border-b border-border py-2.5"
-            : "border-b border-transparent py-5 md:py-7"
+        className={`sticky top-0 z-30 flex flex-col bg-background/80 backdrop-blur-md transition-all duration-300 print:hidden ${
+          rolou || menuAberto
+            ? "border-b border-border"
+            : "border-b border-transparent"
         }`}
       >
-        {/*
-         * A assinatura. Some no celular quando a barra encolhe: em 320px, o
-         * menu e o seletor de idioma valem mais que um atalho para o topo que
-         * já existe como primeiro item do próprio menu.
-         */}
-        <a
-          href="#topo"
-          aria-label={t(ui.a11y.toTop)}
-          className={`hidden shrink-0 font-semibold tracking-[0.12em] text-web-strong transition-all duration-300 hover:opacity-80 sm:block ${
-            rolou ? "text-xl md:text-2xl" : "text-3xl md:text-4xl"
+        <div
+          className={`flex items-center justify-between gap-4 px-5 transition-all duration-300 md:px-12 ${
+            rolou ? "py-2.5" : "py-4 md:py-6"
           }`}
         >
-          BS
-        </a>
+          <a
+            href="#topo"
+            aria-label={t(ui.a11y.toTop)}
+            className={`shrink-0 font-semibold tracking-[0.12em] text-web-strong transition-all duration-300 hover:opacity-80 ${
+              rolou ? "text-xl md:text-2xl" : "text-2xl md:text-4xl"
+            }`}
+          >
+            BS
+          </a>
 
-        <nav
-          aria-label={t(ui.a11y.mainNav)}
-          className={`no-scrollbar -mx-1 flex min-w-0 flex-1 overflow-x-auto px-1 transition-all duration-300 sm:justify-end ${
-            rolou ? "gap-x-4 sm:gap-x-6" : "gap-x-5 sm:gap-x-8"
-          }`}
-        >
-          {NAV.map((id) => {
-            const atual = ativa === id;
-            return (
+          <nav
+            aria-label={t(ui.a11y.mainNav)}
+            className={`hidden min-w-0 flex-1 justify-end transition-all duration-300 sm:flex ${
+              rolou ? "gap-x-4 lg:gap-x-6" : "gap-x-5 lg:gap-x-8"
+            }`}
+          >
+            {NAV.map((id) => (
               <a
                 key={id}
                 href={`#${id}`}
-                aria-current={atual ? "true" : undefined}
+                aria-current={ativa === id ? "true" : undefined}
                 className={`link-web shrink-0 font-mono uppercase transition-all duration-300 ${
                   rolou
-                    ? "text-[0.68rem] tracking-[0.14em]"
-                    : "text-[0.8rem] tracking-[0.18em]"
-                } ${atual ? "text-web-strong" : "text-muted-foreground"}`}
+                    ? "text-[0.68rem] tracking-[0.12em]"
+                    : "text-[0.78rem] tracking-[0.16em]"
+                } ${ativa === id ? "text-web-strong" : "text-muted-foreground"}`}
               >
                 {t(ui.nav[id])}
               </a>
-            );
-          })}
-        </nav>
+            ))}
+          </nav>
 
-        <LocaleSwitch />
+          <div className="flex shrink-0 items-center gap-2">
+            <LocaleSwitch />
+
+            <button
+              type="button"
+              aria-expanded={menuAberto}
+              aria-controls="menu-celular"
+              aria-label={menuAberto ? t(ui.a11y.closeMenu) : t(ui.a11y.menu)}
+              onClick={() => setMenuAberto((v) => !v)}
+              className="label-sm flex items-center gap-2 border border-border px-3 py-1.5 text-muted-foreground transition-colors hover:border-web hover:text-web-strong sm:hidden"
+            >
+              {t(ui.a11y.menu)}
+              {/* Duas barras que viram um X. */}
+              <span aria-hidden="true" className="relative block h-3 w-3.5">
+                <span
+                  className={`absolute left-0 block h-px w-full bg-current transition-all duration-300 ${
+                    menuAberto ? "top-1.5 rotate-45" : "top-0.5"
+                  }`}
+                />
+                <span
+                  className={`absolute left-0 block h-px w-full bg-current transition-all duration-300 ${
+                    menuAberto ? "top-1.5 -rotate-45" : "top-2.5"
+                  }`}
+                />
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {menuAberto && (
+          <nav
+            id="menu-celular"
+            aria-label={t(ui.a11y.mainNav)}
+            className="disclosure-body border-t border-border px-5 pb-4 sm:hidden"
+          >
+            <ul className="flex flex-col">
+              {NAV.map((id) => (
+                <li key={id}>
+                  <a
+                    href={`#${id}`}
+                    aria-current={ativa === id ? "true" : undefined}
+                    onClick={() => setMenuAberto(false)}
+                    className={`label block border-b border-border/60 py-3.5 transition-colors ${
+                      ativa === id ? "text-web-strong" : "text-muted-foreground"
+                    }`}
+                  >
+                    {t(ui.nav[id])}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
       </header>
 
       <main className="relative z-10">

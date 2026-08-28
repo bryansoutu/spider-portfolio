@@ -98,6 +98,8 @@ export const ui = {
   a11y: {
     mainNav: { "pt-BR": "Navegação principal", en: "Main navigation" },
     toTop: { "pt-BR": "Voltar ao início", en: "Back to top" },
+    menu: { "pt-BR": "Menu", en: "Menu" },
+    closeMenu: { "pt-BR": "Fechar o menu", en: "Close menu" },
   },
 } satisfies Record<string, unknown>;
 

@@ -132,12 +132,12 @@ function CartaoDestaque({ project }: { project: Project }) {
 
           <p className="corpo mt-5 text-foreground/90">{t(project.outcome)}</p>
 
-          <div className="mt-7 flex flex-wrap items-center gap-3">
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <a
               href={project.liveUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="label-sm border border-web bg-web px-5 py-2.5 text-background transition-opacity hover:opacity-85"
+              className="label-sm w-full border border-web bg-web px-5 py-3 text-center text-background transition-opacity hover:opacity-85 sm:w-auto sm:py-2.5"
             >
               {t(ui.projects.live)} ↗
             </a>
@@ -158,7 +158,7 @@ function CartaoDestaque({ project }: { project: Project }) {
               aria-expanded={aberto}
               aria-controls={painelId}
               onClick={() => setAberto((v) => !v)}
-              className="label-sm ml-auto flex items-center gap-2 border border-border px-4 py-2.5 text-muted-foreground transition-colors hover:border-web hover:text-web-strong"
+              className="label-sm flex w-full items-center justify-center gap-2 border border-border px-4 py-3 text-muted-foreground transition-colors hover:border-web hover:text-web-strong sm:ml-auto sm:w-auto sm:py-2.5"
             >
               {aberto ? t(ui.projects.close) : t(ui.projects.open)}
               <Mais aberto={aberto} />
@@ -214,7 +214,7 @@ function LinhaCompacta({ project }: { project: Project }) {
 
       <p className="corpo mt-4 max-w-2xl text-foreground/85">{t(project.outcome)}</p>
 
-      <div className="mt-5 flex flex-wrap items-center gap-x-7 gap-y-3">
+      <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-7">
         {project.repoUrl && (
           <a
             href={project.repoUrl}
@@ -231,7 +231,7 @@ function LinhaCompacta({ project }: { project: Project }) {
           aria-expanded={aberto}
           aria-controls={painelId}
           onClick={() => setAberto((v) => !v)}
-          className="label-sm ml-auto flex items-center gap-2 border border-border px-4 py-2 text-muted-foreground transition-colors hover:border-web hover:text-web-strong"
+          className="label-sm flex w-full items-center justify-center gap-2 border border-border px-4 py-3 text-muted-foreground transition-colors hover:border-web hover:text-web-strong sm:ml-auto sm:w-auto sm:py-2"
         >
           {aberto ? t(ui.projects.close) : t(ui.projects.open)}
           <Mais aberto={aberto} />
@@ -253,7 +253,7 @@ export function Projects() {
     <Section
       id="projetos"
       label={t(ui.nav.projetos)}
-      className="mx-auto w-full max-w-4xl scroll-mt-24 px-6 py-24 md:py-32 xl:max-w-6xl xl:px-8 2xl:max-w-7xl"
+      className="mx-auto w-full max-w-4xl scroll-mt-24 px-6 py-16 sm:py-24 md:py-32 xl:max-w-6xl xl:px-8 2xl:max-w-7xl"
     >
       <ul className="mt-10 grid gap-8 xl:gap-10">
         {destaques.map((project) => (
