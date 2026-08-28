@@ -22,13 +22,15 @@
     <meta name="twitter:card" content="summary_large_image" />
 
     <!--
-      Marca que o JavaScript está vivo, antes da primeira pintura. O CSS só
-      esconde os elementos de entrada quando esta classe existe — sem JS, a
-      página nasce legível em vez de invisível para sempre.
+      NÃO existe script inline nesta página, e isso é proposital.
+      A marca `js-reveal` que antes era escrita aqui mudou para `main.tsx`.
+
+      O motivo é a Content-Security-Policy em `vercel.json`: com um único
+      script inline na página, a política precisaria liberar `'unsafe-inline'`
+      ou carregar um hash que muda a cada edição. Sem nenhum, ela pode dizer
+      `script-src 'self'` e pronto — nenhum script injetado por terceiro roda,
+      qualquer que seja o caminho da injeção.
     -->
-    <script>
-      document.documentElement.classList.add("js-reveal");
-    </script>
   </head>
   <body>
     <div id="root"></div>

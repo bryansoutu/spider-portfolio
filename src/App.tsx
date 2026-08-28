@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { Loader } from "@/components/Loader";
 import { WebBackground } from "@/components/WebBackground";
@@ -140,6 +140,13 @@ function Pagina() {
   const ativa = useSecaoAtiva(NAV);
   const rolou = useRolou();
 
+  /*
+   * Estável de propósito. Esta página re-renderiza a cada rolagem (menu ativo
+   * e tamanho do cabeçalho moram aqui), e um callback recriado a cada vez
+   * reiniciava o relógio da cortina de abertura.
+   */
+  const encerrarAbertura = useCallback(() => setLoading(false), []);
+
   useEffect(() => {
     const els = document.querySelectorAll("[data-reveal]");
     const io = new IntersectionObserver(
@@ -199,7 +206,7 @@ function Pagina() {
    */
   return (
     <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
-      {loading && <Loader onDone={() => setLoading(false)} />}
+      {loading && <Loader onDone={encerrarAbertura} />}
       <WebBackground />
       <ProgressoDeLeitura />
 

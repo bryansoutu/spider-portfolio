@@ -6,9 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "check:headers": "node scripts/check-headers.mjs",
     "images": "node scripts/optimize-images.mjs",
-    "resume:pdf": "vite build && node scripts/resume-pdf.mjs",
-    "preview": "vite preview"
+    "resume:pdf": "vite build && node scripts/resume-pdf.mjs"
   },
   "dependencies": {
     "react": "^19.2.0",

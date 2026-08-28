@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { ui } from "@/content/ui";
 import { useLocale } from "@/lib/locale";
@@ -18,6 +18,20 @@ import { useLocale } from "@/lib/locale";
  *    navegador der um tick só, esse tick já calcula a posição certa.
  * 2. Existe um teto absoluto. Se nem isso acontecer, a cortina sai sozinha —
  *    porque nenhuma animação de entrada vale uma página que não abre.
+ *
+ * TERCEIRA correção, encontrada pelos testes em 28/08/2026 e da mesma família
+ * das outras duas: a cortina ficava de pé indefinidamente para quem rolasse a
+ * página durante a abertura.
+ *
+ * O `onDone` chegava como arrow function criada na renderização do pai. O pai
+ * guarda estado que muda a cada rolagem (a seção ativa no menu e o tamanho do
+ * cabeçalho), então cada rolagem o re-renderizava, o `onDone` mudava de
+ * identidade, o efeito abaixo era desmontado com ela — limpando o intervalo E
+ * o teto — e recomeçava do zero, com `inicio` remarcado. Rolar segurava a
+ * cortina; rolar sem parar a segurava para sempre.
+ *
+ * Por isso o callback vive num ref e o efeito não depende de nada. O relógio
+ * começa uma vez e não pode mais ser reiniciado por decisão de quem chama.
  */
 /*
  * 1,1s de abertura, com corte absoluto em 2,2s.
@@ -38,6 +52,10 @@ export function Loader({ onDone }: { onDone: () => void }) {
   const [progress, setProgress] = useState(0);
   const [hiding, setHiding] = useState(false);
 
+  /* Sempre o `onDone` mais recente, sem que trocá-lo reinicie o relógio. */
+  const aoTerminar = useRef(onDone);
+  aoTerminar.current = onDone;
+
   useEffect(() => {
     const inicio = Date.now();
 
@@ -48,20 +66,20 @@ export function Loader({ onDone }: { onDone: () => void }) {
       if (valor >= 100) {
         window.clearInterval(id);
         window.setTimeout(() => setHiding(true), 120);
-        window.setTimeout(onDone, 440);
+        window.setTimeout(() => aoTerminar.current(), 440);
       }
     }, 80);
 
     const teto = window.setTimeout(() => {
       setHiding(true);
-      onDone();
+      aoTerminar.current();
     }, TETO_MS);
 
     return () => {
       window.clearInterval(id);
       window.clearTimeout(teto);
     };
-  }, [onDone]);
+  }, []);
 
   return (
     <div
