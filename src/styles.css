@@ -270,6 +270,40 @@
 }
 
 /*
+ * Sem o menu de toque longo.
+ *
+ * Segurar o dedo sobre o retrato abria o menu do sistema — "Salvar imagem",
+ * "Copiar", "Compartilhar". Não é bug do navegador: é o comportamento padrão
+ * para qualquer <img>, e faz sentido numa galeria de fotos. Aqui o retrato é
+ * um CONTROLE, não uma foto para guardar, e o menu aparecia bem no gesto que a
+ * pessoa faz quando o primeiro toque não parece ter funcionado.
+ *
+ * São três coisas, porque cada navegador se rende por um caminho diferente:
+ *
+ *   `-webkit-touch-callout` desliga o menu no Safari do iPhone, que é onde ele
+ *   é mais insistente.
+ *   `user-select: none` tira a seleção que acompanha o toque longo no Android.
+ *   `pointer-events: none` nas imagens faz o dedo acertar sempre o botão, e
+ *   nunca a <img> — sem alvo de imagem, não há menu de imagem.
+ *
+ * O `tap-highlight-color` transparente tira o retângulo cinza que o Chrome do
+ * Android pisca por cima do elemento tocado. Num círculo, ele aparecia como um
+ * quadrado por trás do retrato.
+ */
+@utility sem-toque-longo {
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+
+  & img {
+    pointer-events: none;
+    -webkit-user-drag: none;
+    user-select: none;
+  }
+}
+
+/*
  * Rótulo mono — o texto miúdo e espaçado que o site usa para tudo que não é
  * corpo: navegação, categorias, datas, status.
  *

@@ -25,21 +25,34 @@ test("abre em português quando o navegador é pt-BR", async ({ browser }) => {
   await ctx.close();
 });
 
-test("abre em inglês quando o navegador não é português", async ({ browser }) => {
-  const ctx = await browser.newContext({ locale: "de-DE" });
-  const page = await ctx.newPage();
-  await page.goto("/");
-  await page.getByRole("heading", { level: 1 }).waitFor();
-
+test("a primeira visita abre em português, seja qual for o navegador", async ({
+  browser,
+}) => {
   /*
-   * O alemão é escolhido de propósito: não é português nem inglês. Testar com
-   * `en-US` esconderia a falha de o site simplesmente devolver o padrão em vez
-   * de decidir de fato.
+   * Decisão de 28/08: o padrão é português, e NÃO o idioma do navegador.
+   *
+   * A versão anterior detectava — e errava para o caso comum. O público deste
+   * site é vaga no Brasil, e qualquer navegador configurado em inglês (o que
+   * não é raro em máquina de desenvolvedor) fazia um visitante brasileiro cair
+   * na versão em inglês. Quem chega de fora é a exceção, e para a exceção
+   * existe o seletor no cabeçalho, visível na primeira tela.
+   *
+   * As três línguas testadas cobrem o inglês, um terceiro idioma qualquer e o
+   * próprio português.
    */
-  await expect(page.locator("html")).toHaveAttribute("lang", "en");
-  await abrirMenuSePreciso(page);
-  await expect(itemDeMenu(page, "Home")).toBeVisible();
-  await ctx.close();
+  for (const locale of ["en-US", "de-DE", "pt-BR"]) {
+    const ctx = await browser.newContext({ locale });
+    const page = await ctx.newPage();
+    await page.goto("/");
+    await page.getByRole("heading", { level: 1 }).waitFor();
+
+    await expect(
+      page.locator("html"),
+      `navegador em ${locale} deveria abrir em português`
+    ).toHaveAttribute("lang", "pt-BR");
+
+    await ctx.close();
+  }
 });
 
 test("o parâmetro ?lang= manda mais que o navegador", async ({ browser }) => {

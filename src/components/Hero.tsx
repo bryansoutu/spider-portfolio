@@ -30,17 +30,9 @@ export function Hero() {
   const { t } = useLocale();
   const [hover, setHover] = useState(false);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const portraitRef = useRef<HTMLDivElement>(null);
-
-  const onPointerMove = (e: React.PointerEvent) => {
-    const el = portraitRef.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    setTilt({
-      x: ((e.clientY - r.top) / r.height - 0.5) * -14,
-      y: ((e.clientX - r.left) / r.width - 0.5) * 14,
-    });
-  };
+  const portraitRef = useRef<HTMLButtonElement>(null);
+  /* Qual ponteiro encostou por último: separa dedo de mouse no clique. */
+  const ultimoPonteiro = useRef<string>("mouse");
 
   return (
     <section
@@ -80,21 +72,59 @@ export function Hero() {
           {t(ui.hero.eyebrow)}
         </p>
 
-        <div
+        <button
+          type="button"
           ref={portraitRef}
-          onPointerMove={onPointerMove}
-          onPointerEnter={() => setHover(true)}
-          onPointerLeave={() => {
+          aria-pressed={hover}
+          aria-label={t(ui.hero.portraitToggle)}
+          /*
+           * Os três eventos abaixo valem SÓ para o mouse.
+           *
+           * O navegador dispara eventos de ponteiro de mouse também no toque,
+           * por compatibilidade com sites antigos. Um toque virava
+           * `pointerenter` (liga a máscara) seguido de `click` (alterna de
+           * volta): piscava e não mudava nada.
+           */
+          onPointerMove={(e) => {
+            if (e.pointerType !== "mouse") return;
+            const el = portraitRef.current;
+            if (!el) return;
+            const r = el.getBoundingClientRect();
+            setTilt({
+              x: ((e.clientY - r.top) / r.height - 0.5) * -14,
+              y: ((e.clientX - r.left) / r.width - 0.5) * 14,
+            });
+          }}
+          onPointerEnter={(e) => {
+            if (e.pointerType === "mouse") setHover(true);
+          }}
+          onPointerLeave={(e) => {
+            if (e.pointerType !== "mouse") return;
             setHover(false);
             setTilt({ x: 0, y: 0 });
           }}
+          onPointerDown={(e) => {
+            ultimoPonteiro.current = e.pointerType;
+          }}
           /*
-           * Toque também alterna. Em celular não existe hover, e é de celular
-           * que vem a maior parte das visitas — sem isto o efeito não existiria
-           * para quase ninguém.
+           * O clique alterna e FICA — o "toca e muda, toca de novo e muda"
+           * que se espera no celular. Com mouse ele não faz nada, senão
+           * desfaria no primeiro clique o que a passagem acabou de fazer.
+           *
+           * O tipo vem do PRÓPRIO evento, não do último ponteiro guardado. É
+           * o que faz o teclado funcionar: o clique sintético do Enter tem
+           * `pointerType` vazio, enquanto o ref ainda diria "mouse" — nenhum
+           * ponteiro encostou. O ref fica como reserva para navegador que não
+           * entrega `pointerType` no clique.
            */
-          onClick={() => setHover((v) => !v)}
-          className={`portrait-ring group relative mt-8 h-[clamp(13rem,24vw,22rem)] w-[clamp(13rem,24vw,22rem)] ${hover ? "mask-glow" : ""}`}
+          onClick={(e) => {
+            const tipo =
+              "pointerType" in e.nativeEvent
+                ? (e.nativeEvent as PointerEvent).pointerType
+                : ultimoPonteiro.current;
+            if (tipo !== "mouse") setHover((v) => !v);
+          }}
+          className={`portrait-ring sem-toque-longo group relative mt-8 h-[clamp(13rem,24vw,22rem)] w-[clamp(13rem,24vw,22rem)] ${hover ? "mask-glow" : ""}`}
           style={{
             transform: `perspective(900px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
           }}
@@ -102,7 +132,8 @@ export function Hero() {
           <div className="absolute inset-0 overflow-hidden rounded-full bg-background">
             <img
               src={faceAsset}
-              alt={`${profile.name}`}
+              alt=""
+              draggable={false}
               className={`absolute inset-0 h-full w-full object-cover object-top transition-all duration-500 ${
                 hover ? "scale-95 opacity-0 blur-sm" : "scale-100 opacity-100"
               }`}
@@ -111,14 +142,13 @@ export function Hero() {
               src={maskAsset}
               alt=""
               aria-hidden="true"
+              draggable={false}
               className={`absolute inset-0 h-full w-full object-cover object-center brightness-[1.15] contrast-110 transition-all duration-500 ${
-                hover
-                  ? "scale-[1.45] opacity-100"
-                  : "scale-[1.6] opacity-0 blur-sm"
+                hover ? "scale-[1.45] opacity-100" : "scale-[1.6] opacity-0 blur-sm"
               }`}
             />
           </div>
-        </div>
+        </button>
 
         <p
           aria-hidden="true"

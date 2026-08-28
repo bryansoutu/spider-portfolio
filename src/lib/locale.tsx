@@ -15,8 +15,14 @@ import { LOCALES, type Locale, type Localized } from "./types";
  *   1. `?lang=` na URL — usado pelo gerador de PDF, que precisa fixar o idioma
  *      sem depender de nada guardado no navegador.
  *   2. O que a pessoa escolheu da última vez (localStorage).
- *   3. O idioma do navegador: qualquer `pt-*` cai em português, o resto em
- *      inglês. Um recrutador de fora abre o site já em inglês sem clicar.
+ *   3. Português. É o padrão, e não o idioma do navegador.
+ *
+ * A terceira regra já foi "detectar pelo navegador", e foi trocada de
+ * propósito. O público real deste site é vaga no Brasil; quem chega de fora é
+ * a exceção, e para essa exceção existe o seletor no cabeçalho, visível na
+ * primeira tela. Detectar automaticamente errava para o caso comum — qualquer
+ * navegador configurado em inglês, o que não é raro em máquina de
+ * desenvolvedor, abria o site em inglês para um visitante brasileiro.
  */
 const STORAGE_KEY = "spider-portfolio:locale";
 
@@ -37,7 +43,7 @@ function detectLocale(): Locale {
     /* modo privado pode recusar o storage; o idioma do navegador resolve */
   }
 
-  return window.navigator.language?.toLowerCase().startsWith("pt") ? "pt-BR" : "en";
+  return "pt-BR";
 }
 
 interface LocaleContextValue {

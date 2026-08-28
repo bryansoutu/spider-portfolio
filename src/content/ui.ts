@@ -31,6 +31,10 @@ export const ui = {
       "pt-BR": "Passe o mouse — ou toque",
       en: "Hover — or tap",
     },
+    portraitToggle: {
+      "pt-BR": "Alternar entre a foto e a máscara",
+      en: "Switch between the photo and the mask",
+    },
     stats: {
       produtos: { "pt-BR": "produtos no ar", en: "products live" },
       idiomas: { "pt-BR": "idiomas publicados", en: "languages shipped" },
