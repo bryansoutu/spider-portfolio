@@ -203,13 +203,14 @@ export function Hero() {
              * Os números abaixo vêm de medir as duas imagens e fazer as linhas
              * dos olhos e a largura da cabeça coincidirem:
              *
-             *   scale 0.95   iguala a altura das duas cabeças (440/465)
-             *   translate    põe o centro da máscara sobre o centro do rosto,
-             *                que está um pouco à direita e abaixo. O valor
-             *                vertical foi calibrado sobrepondo as duas imagens
-             *                a 50% e conferindo se as lentes caem em cima dos
-             *                olhos — na primeira tentativa as pupilas ficavam
-             *                na borda de baixo da lente
+             *   scale 1.02   iguala a altura das duas cabeças. Era 0,95 com a
+             *                foto anterior; a atual é mais fechada e a cabeça
+             *                ficou ~7% maior, então a máscara subiu junto
+             *   translate    só vertical: o recorte da foto é simétrico ao
+             *                rosto, então não há nada a corrigir na horizontal.
+             *                O valor foi calibrado sobrepondo as duas imagens a
+             *                50% de opacidade e conferindo se as lentes caem em
+             *                cima dos olhos
              *
              * Nada é recortado no arquivo: os dois assets seguem intactos, em
              * resolução cheia. O ajuste é só transformação de CSS, que o
@@ -222,8 +223,8 @@ export function Hero() {
               draggable={false}
               className={`absolute inset-0 h-full w-full origin-center object-cover object-center brightness-[1.08] contrast-105 transition-all duration-500 ${
                 hover
-                  ? "translate-x-[1.8%] translate-y-[2.6%] scale-[0.95] opacity-100"
-                  : "translate-x-[1.8%] translate-y-[2.6%] scale-[1.06] opacity-0 blur-sm"
+                  ? "translate-y-[5%] scale-[1.02] opacity-100"
+                  : "translate-y-[5%] scale-[1.14] opacity-0 blur-sm"
               }`}
             />
           </div>
