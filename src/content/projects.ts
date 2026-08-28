@@ -123,6 +123,12 @@ export const projects: Project[] = [
       en: "Live and bilingual, picking the language from the visitor's browser. The portrait went from 5.9 MB to 71 KB (same 320px circle on screen), the red's contrast was measured before it shipped, focus is visible on every clickable element, and all motion switches off under prefers-reduced-motion. The source is open — it is the case study.",
     },
     stack: ["Vite", "React 19", "TypeScript", "Tailwind CSS 4", "Canvas 2D"],
+    /*
+     * O resultado deste case termina com "o código está aberto — é o próprio
+     * case", e até agora não havia link nenhum para conferir. Afirmação sem
+     * como verificar é exatamente o que o site diz não fazer.
+     */
+    repoUrl: "https://github.com/bryansoutu/spider-portfolio",
   },
 ];
 

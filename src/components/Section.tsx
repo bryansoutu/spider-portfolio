@@ -20,7 +20,7 @@ export function Section({
   id,
   label,
   children,
-  className = "mx-auto max-w-3xl px-6 py-24 md:py-32",
+  className = "mx-auto w-full max-w-3xl scroll-mt-24 px-6 py-24 md:py-32 xl:max-w-4xl xl:px-8",
 }: {
   id: string;
   label: string;
@@ -31,9 +31,7 @@ export function Section({
     <section id={id} aria-labelledby={`${id}-label`} className={`scroll-mt-24 ${className}`}>
       <h2 id={`${id}-label`} data-reveal className="reveal flex items-center gap-3">
         <span aria-hidden="true" className="h-px w-12 bg-web print:hidden" />
-        <span className="font-mono text-base tracking-[0.22em] text-web-strong uppercase md:text-lg">
-          {label}
-        </span>
+        <span className="rotulo-secao text-web-strong">{label}</span>
       </h2>
       {children}
     </section>

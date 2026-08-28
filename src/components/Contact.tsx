@@ -17,7 +17,7 @@ export function About() {
     <Section id="sobre" label={t(ui.nav.sobre)}>
       <p
         data-reveal
-        className="reveal mt-8 text-xl leading-relaxed text-foreground/95 md:text-2xl"
+        className="corpo-destaque reveal mt-8 text-foreground/95"
       >
         {t(summary)}
       </p>
@@ -46,16 +46,16 @@ export function Contact() {
     <Section
       id="contato"
       label={t(ui.nav.contato)}
-      className="mx-auto max-w-3xl scroll-mt-24 px-6 py-24 md:py-32"
+      className="mx-auto w-full max-w-3xl scroll-mt-24 px-6 py-24 md:py-32 xl:max-w-4xl xl:px-8"
     >
-      <p data-reveal className="reveal mt-8 text-base text-foreground/90 md:text-lg">
+      <p data-reveal className="corpo reveal mt-8 text-foreground/90">
         {t(ui.contact.intro)}
       </p>
 
       <a
         data-reveal
         href={`mailto:${profile.email}`}
-        className="reveal link-web mt-6 inline-block text-2xl font-medium break-all md:text-4xl"
+        className="reveal link-web mt-6 inline-block text-[clamp(1.4rem,3vw,2.6rem)] font-medium break-all"
       >
         {profile.email}
       </a>

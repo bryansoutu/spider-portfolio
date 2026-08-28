@@ -145,3 +145,98 @@ test("rolar durante a abertura não segura a cortina", async ({ page }) => {
   await botao.click();
   await expect(botao).toHaveAttribute("aria-expanded", "true");
 });
+
+test("a tipografia e a faixa de conteúdo crescem com a tela", async ({ page }) => {
+  /*
+   * A queixa de 28/08: "o site não tá muito responsivo".
+   *
+   * Não havia rolagem horizontal em largura nenhuma — o teste acima já
+   * garantia isso, e passava. O problema era outro e mais sutil: o site tinha
+   * UMA quebra. De 320px a 767px nada mudava, tudo saltava de uma vez em
+   * 768px, e de 768px a 1920px nada mudava de novo. Num monitor de 1920 a
+   * página era idêntica à de um tablet, com 512px de margem vazia de cada lado.
+   *
+   * "Não quebra" não é o mesmo que "se adapta". Este teste cobra a segunda
+   * coisa: entre uma largura e a seguinte, o texto e a faixa de conteúdo
+   * precisam ter crescido de fato.
+   */
+  const medir = async (width: number) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.waitForTimeout(200);
+    return page.evaluate(() => {
+      const fonte = (sel: string) => {
+        const el = document.querySelector(sel);
+        return el ? parseFloat(getComputedStyle(el).fontSize) : 0;
+      };
+      const largura = (sel: string) => {
+        const el = document.querySelector(sel);
+        return el ? el.getBoundingClientRect().width : 0;
+      };
+      return { h1: fonte("h1"), faixa: largura("#projetos") };
+    });
+  };
+
+  await page.goto("/?lang=pt-BR");
+  await page.getByRole("heading", { level: 1 }).waitFor();
+
+  const larguras = [360, 768, 1280, 1920];
+  const medidas = [];
+  for (const w of larguras) medidas.push({ w, ...(await medir(w)) });
+
+  for (let i = 1; i < medidas.length; i++) {
+    const antes = medidas[i - 1]!;
+    const agora = medidas[i]!;
+
+    expect(
+      agora.h1,
+      `o título não cresceu de ${antes.w}px (${antes.h1}) para ${agora.w}px (${agora.h1})`
+    ).toBeGreaterThan(antes.h1);
+
+    expect(
+      agora.faixa,
+      `a faixa de conteúdo não cresceu de ${antes.w}px para ${agora.w}px`
+    ).toBeGreaterThan(antes.faixa);
+  }
+
+  /*
+   * E o crescimento tem teto: texto que só aumenta vira cartaz num monitor
+   * ultrawide, e linha longa demais é tão ruim de ler quanto letra pequena.
+   */
+  const ultrawide = await medir(2560);
+  expect(ultrawide.h1).toBeLessThanOrEqual(medidas.at(-1)!.h1 * 1.15);
+});
+
+test("os projetos no ar têm destaque maior que os demais", async ({ page }) => {
+  /*
+   * A outra metade do pedido: "mais destaque nos projetos, principalmente os
+   * que estão no ar". Antes os quatro eram linhas de texto idênticas, e um
+   * provedor de internet com clientes reais tinha o mesmo peso visual de um
+   * script arquivado.
+   *
+   * O teste não julga estética — mede o que dá para medir: os que estão no ar
+   * mostram a captura SEM precisar abrir, trazem o selo, e ocupam mais tela.
+   */
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/?lang=pt-BR");
+  await page.locator("#projetos").scrollIntoViewIfNeeded();
+
+  const destaques = page.locator("#projetos > ul").first().locator("> li");
+  await expect(destaques).toHaveCount(2);
+
+  // Captura à vista, sem abrir nada.
+  await expect(destaques.first().locator("img").first()).toBeVisible();
+  await expect(destaques.first().getByText(/^no ar$/i)).toBeVisible();
+
+  // E o link de visitar aponta para fora, não para uma âncora da página.
+  const href = await destaques.first().getByRole("link", { name: /ver no ar/i }).first().getAttribute("href");
+  expect(href).toMatch(/^https:\/\//);
+
+  const alturaDestaque = (await destaques.first().boundingBox())!.height;
+  const compacta = page.locator("#projetos > ul").last().locator("> li").first();
+  const alturaCompacta = (await compacta.boundingBox())!.height;
+
+  expect(
+    alturaDestaque,
+    `destaque ${Math.round(alturaDestaque)}px vs compacta ${Math.round(alturaCompacta)}px`
+  ).toBeGreaterThan(alturaCompacta);
+});

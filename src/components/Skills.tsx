@@ -39,7 +39,7 @@ export function Capabilities() {
     <Section
       id="faco"
       label={t(ui.nav.faco)}
-      className="mx-auto max-w-4xl scroll-mt-24 px-6 py-24 md:py-32"
+      className="mx-auto w-full max-w-4xl scroll-mt-24 px-6 py-24 md:py-32 xl:max-w-5xl xl:px-8 2xl:max-w-6xl"
     >
       <ul className="mt-10 border-t border-border">
         {capabilities.map((capability, i) => (
@@ -55,10 +55,10 @@ export function Capabilities() {
               [ {String.fromCharCode(97 + i)} ]
             </span>
             <div>
-              <h3 className="text-2xl font-medium transition-transform duration-300 group-hover:translate-x-1.5 md:text-3xl">
+              <h3 className="titulo-bloco font-medium transition-transform duration-300 group-hover:translate-x-1.5">
                 {t(capability.name)}
               </h3>
-              <p className="mt-3 max-w-2xl text-base leading-relaxed text-foreground/85 md:text-lg">
+              <p className="corpo mt-3 max-w-2xl text-foreground/85">
                 {t(capability.description)}
               </p>
             </div>
@@ -123,7 +123,7 @@ function SoftSkillRow({
         onClick={() => setAberto((v) => !v)}
         className="group flex w-full items-center gap-4 py-6 text-left md:px-4"
       >
-        <span className="flex-1 text-lg font-medium transition-transform duration-300 group-hover:translate-x-1.5 md:text-xl">
+        <span className="corpo-destaque flex-1 font-medium transition-transform duration-300 group-hover:translate-x-1.5">
           {label}
         </span>
         <span
@@ -139,7 +139,7 @@ function SoftSkillRow({
       {aberto && (
         <p
           id={painelId}
-          className="disclosure-body max-w-3xl pb-7 text-base leading-relaxed text-foreground/85 md:px-4 md:text-lg"
+          className="corpo disclosure-body max-w-3xl pb-7 text-foreground/85 md:px-4"
         >
           {evidence}
         </p>
@@ -177,7 +177,7 @@ export function Skills() {
     <Section
       id="habilidades"
       label={t(ui.nav.habilidades)}
-      className="mx-auto max-w-4xl scroll-mt-24 px-6 py-24 md:py-32"
+      className="mx-auto w-full max-w-4xl scroll-mt-24 px-6 py-24 md:py-32 xl:max-w-5xl xl:px-8 2xl:max-w-6xl"
     >
       <div data-reveal className="reveal mt-10 flex flex-wrap items-center gap-2">
         <Chip ativo={categoria === "tudo"} onClick={() => setCategoria("tudo")}>
@@ -214,7 +214,7 @@ export function Skills() {
        * branco sem explicação, que se lê como bug.
        */}
       {visiveis.length === 0 && (
-        <p className="mt-8 max-w-lg text-base leading-relaxed text-muted-foreground md:text-lg">
+        <p className="corpo mt-8 max-w-lg text-muted-foreground">
           {t(ui.skills.empty)}{" "}
           <button
             type="button"
@@ -254,9 +254,7 @@ export function Skills() {
 
       <h3 data-reveal className="reveal mt-24 flex items-center gap-3">
         <span aria-hidden="true" className="h-px w-12 bg-web print:hidden" />
-        <span className="font-mono text-base tracking-[0.22em] text-web-strong uppercase md:text-lg">
-          {t(ui.skills.howIWork)}
-        </span>
+        <span className="rotulo-secao text-web-strong">{t(ui.skills.howIWork)}</span>
       </h3>
 
       <ul className="mt-8 border-t border-border">

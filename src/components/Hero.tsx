@@ -94,7 +94,7 @@ export function Hero() {
            * para quase ninguém.
            */
           onClick={() => setHover((v) => !v)}
-          className={`portrait-ring group relative mt-8 h-64 w-64 md:h-80 md:w-80 ${hover ? "mask-glow" : ""}`}
+          className={`portrait-ring group relative mt-8 h-[clamp(13rem,24vw,22rem)] w-[clamp(13rem,24vw,22rem)] ${hover ? "mask-glow" : ""}`}
           style={{
             transform: `perspective(900px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
           }}
@@ -131,14 +131,14 @@ export function Hero() {
 
         <h1
           data-reveal
-          className="reveal mt-8 text-5xl font-semibold tracking-tight md:text-7xl"
+          className="titulo-hero reveal mt-8 font-semibold tracking-tight"
         >
           {profile.shortName}
         </h1>
 
         <p
           data-reveal
-          className="reveal mt-5 max-w-xl text-base leading-relaxed text-foreground/90 md:text-lg"
+          className="corpo-destaque reveal mt-5 max-w-2xl text-foreground/90"
         >
           {t(profile.headline)}
         </p>
@@ -166,7 +166,7 @@ export function Hero() {
             <div key={stat.value} className="min-w-[8.5rem] px-7 py-5 sm:px-10">
               <dt className="sr-only">{t(stat.label)}</dt>
               <dd>
-                <span className="block text-3xl font-semibold text-web-strong md:text-4xl">
+                <span className="block text-[clamp(1.9rem,2.2vw,3rem)] font-semibold text-web-strong">
                   {stat.value}
                 </span>
                 <span className="label-sm mt-2 block text-muted-foreground">

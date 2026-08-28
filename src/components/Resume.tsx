@@ -48,7 +48,7 @@ export function Resume() {
     <Section
       id="curriculo"
       label={t(ui.nav.curriculo)}
-      className="resume-print mx-auto max-w-3xl scroll-mt-24 px-6 py-24 md:py-32"
+      className="resume-print mx-auto w-full max-w-3xl scroll-mt-24 px-6 py-24 md:py-32 xl:max-w-4xl xl:px-8"
     >
       <div className="mt-8 flex flex-wrap gap-3 print:hidden">
         <a
@@ -124,7 +124,7 @@ export function Resume() {
            * só então diz de quem é — e o resumo já aparece na seção "Sobre",
            * a uma rolagem daqui, então na tela ele era repetição.
            */}
-          <p className="text-base leading-relaxed text-foreground/90 md:text-lg print:mt-6 print:text-[0.95rem]">
+          <p className="corpo text-foreground/90 print:mt-6 print:text-[0.95rem]">
             {t(summary)}
           </p>
 
@@ -138,7 +138,7 @@ export function Resume() {
                 className="border-b border-border py-8"
               >
                 <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                  <h4 className="text-xl font-medium print:text-lg">{t(entry.role)}</h4>
+                  <h4 className="text-[clamp(1.15rem,0.6vw+1rem,1.5rem)] font-medium print:text-lg">{t(entry.role)}</h4>
                   <span className="label-sm text-muted-foreground">
                     {formatRange(
                       entry.startDate,
@@ -158,7 +158,7 @@ export function Resume() {
                   {t(entry.bullets).map((bullet) => (
                     <li
                       key={bullet}
-                      className="relative pl-5 text-base leading-relaxed text-foreground/85 md:text-lg print:text-[0.9rem] before:absolute before:left-0 before:text-web before:content-['—']"
+                      className="corpo relative pl-5 text-foreground/85 print:text-[0.9rem] before:absolute before:left-0 before:text-web before:content-['—']"
                     >
                       {bullet}
                     </li>
@@ -220,7 +220,7 @@ export function Resume() {
             {languages.map((language) => (
               <li
                 key={t(language.name)}
-                className="flex flex-wrap items-baseline gap-x-4 border-b border-border py-5 text-base md:text-lg print:text-[0.9rem]"
+                className="corpo flex flex-wrap items-baseline gap-x-4 border-b border-border py-5 print:text-[0.9rem]"
               >
                 <span className="font-medium">{t(language.name)}</span>
                 <span className="text-muted-foreground">{t(language.level)}</span>

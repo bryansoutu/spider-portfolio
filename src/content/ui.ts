@@ -51,6 +51,8 @@ export const ui = {
     close: { "pt-BR": "Fechar", en: "Close" },
     live: { "pt-BR": "Ver no ar", en: "Visit site" },
     repo: { "pt-BR": "Ver o código", en: "View code" },
+    tambem: { "pt-BR": "Também construí", en: "Also built" },
+    mobileShot: { "pt-BR": "No celular", en: "On mobile" },
   },
 
   skills: {

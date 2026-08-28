@@ -221,6 +221,55 @@
 }
 
 /*
+ * Tipografia fluida.
+ *
+ * Antes, todo o site tinha UMA quebra: `text-5xl md:text-7xl` e parecidos. O
+ * efeito medido foi que de 320px a 767px nada mudava, saltava tudo de uma vez
+ * em 768px, e de 768px a 1920px nada mudava de novo. Num monitor de 1920 o
+ * site era idêntico ao de um tablet, só que com 512px de margem vazia de cada
+ * lado — que é exatamente a sensação de "não é muito responsivo".
+ *
+ * `clamp(mínimo, preferido, máximo)` resolve isso sem quebra nenhuma: o termo
+ * do meio acompanha a largura da tela continuamente, e os outros dois impedem
+ * que ele fique ilegível no celular ou gigantesco no monitor ultrawide.
+ *
+ * A parte em `rem` de cada termo preferido não é enfeite: `vw` puro ignora o
+ * tamanho de fonte que a pessoa escolheu no navegador, e quem aumenta a fonte
+ * do sistema por baixa visão não veria diferença nenhuma.
+ */
+@utility titulo-hero {
+  font-size: clamp(2.75rem, 4.2vw + 1.5rem, 6rem);
+  line-height: 1.02;
+}
+
+@utility titulo-projeto {
+  font-size: clamp(1.6rem, 1.6vw + 1.1rem, 2.75rem);
+  line-height: 1.15;
+}
+
+@utility titulo-bloco {
+  font-size: clamp(1.35rem, 1vw + 1rem, 2rem);
+  line-height: 1.2;
+}
+
+@utility rotulo-secao {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: clamp(0.9rem, 0.35vw + 0.8rem, 1.2rem);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+@utility corpo {
+  font-size: clamp(1rem, 0.3vw + 0.93rem, 1.25rem);
+  line-height: 1.65;
+}
+
+@utility corpo-destaque {
+  font-size: clamp(1.15rem, 0.7vw + 1rem, 1.6rem);
+  line-height: 1.5;
+}
+
+/*
  * Rótulo mono — o texto miúdo e espaçado que o site usa para tudo que não é
  * corpo: navegação, categorias, datas, status.
  *
