@@ -74,7 +74,17 @@ export function Hero() {
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-0"
       >
-        <WalkingSpider tamanho={24} velocidade={40} />
+        {/*
+         * A maior entra descendo por um fio; a menor já está lá, andando.
+         *
+         * As duas descendo ao mesmo tempo viraria uma cena — e cena pede que a
+         * pessoa pare para assistir, o que é o contrário do que um portfólio
+         * quer nos primeiros segundos. Uma desce, a outra já mora ali.
+         *
+         * O atraso de 1,9s é para ela não descer atrás da cortina de abertura,
+         * que sai por volta de 1,5s.
+         */}
+        <WalkingSpider tamanho={24} velocidade={40} descer atrasoMs={1900} />
         <WalkingSpider tamanho={17} velocidade={58} />
       </div>
 
@@ -154,16 +164,42 @@ export function Hero() {
               alt=""
               draggable={false}
               className={`absolute inset-0 h-full w-full object-cover object-top transition-all duration-500 ${
-                hover ? "scale-95 opacity-0 blur-sm" : "scale-100 opacity-100"
+                hover ? "scale-[1.02] opacity-0 blur-[2px]" : "scale-100 opacity-100"
               }`}
             />
+            {/*
+             * A máscara é posicionada para CAIR EM CIMA do rosto, e não só
+             * aparecer por cima dele.
+             *
+             * O esboço do Lovable ampliava a máscara em 1,45× — daí a
+             * impressão de que a imagem era grande demais. Não era: as duas
+             * fotos têm 768×768 e cabeças de tamanho parecido (≈440px de
+             * altura a dele, ≈465px a da máscara). Era só o zoom.
+             *
+             * Os números abaixo vêm de medir as duas imagens e fazer as linhas
+             * dos olhos e a largura da cabeça coincidirem:
+             *
+             *   scale 0.95   iguala a altura das duas cabeças (440/465)
+             *   translate    põe o centro da máscara sobre o centro do rosto,
+             *                que está um pouco à direita e abaixo. O valor
+             *                vertical foi calibrado sobrepondo as duas imagens
+             *                a 50% e conferindo se as lentes caem em cima dos
+             *                olhos — na primeira tentativa as pupilas ficavam
+             *                na borda de baixo da lente
+             *
+             * Nada é recortado no arquivo: os dois assets seguem intactos, em
+             * resolução cheia. O ajuste é só transformação de CSS, que o
+             * navegador aplica na GPU e sem perda.
+             */}
             <img
               src={maskAsset}
               alt=""
               aria-hidden="true"
               draggable={false}
-              className={`absolute inset-0 h-full w-full object-cover object-center brightness-[1.15] contrast-110 transition-all duration-500 ${
-                hover ? "scale-[1.45] opacity-100" : "scale-[1.6] opacity-0 blur-sm"
+              className={`absolute inset-0 h-full w-full origin-center object-cover object-center brightness-[1.08] contrast-105 transition-all duration-500 ${
+                hover
+                  ? "translate-x-[1.8%] translate-y-[2.6%] scale-[0.95] opacity-100"
+                  : "translate-x-[1.8%] translate-y-[2.6%] scale-[1.06] opacity-0 blur-sm"
               }`}
             />
           </div>
@@ -201,8 +237,8 @@ export function Hero() {
           className="reveal label-sm mt-10 flex items-center gap-3 text-foreground/90"
         >
           <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-web opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-web" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-disponivel opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-disponivel" />
           </span>
           {t(ui.hero.available)}
         </div>

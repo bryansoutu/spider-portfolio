@@ -3,7 +3,22 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <!--
+      Ícones. A ordem importa: o navegador escolhe o PRIMEIRO formato que
+      entende, e o SVG é o único que fica nítido em qualquer tamanho e em
+      qualquer densidade de tela. O .ico existe para o pedido automático que
+      todo navegador faz em /favicon.ico, venha ele de onde vier.
+
+      Os três saem do mesmo `favicon.svg` — `npm run favicon` regera os
+      derivados. Ícone mantido à mão em três tamanhos fica diferente em dois
+      deles na primeira vez que alguém mexe.
+    -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Pinta a barra de endereço do Android com o preto do site. -->
+    <meta name="theme-color" content="#0a0a0a" />
 
     <!-- Os metadados vinham do `head()` do __root.tsx no Lovable, que dizia
          "Lovable App / Lovable Generated Project". Aqui viraram os do Bryan. -->

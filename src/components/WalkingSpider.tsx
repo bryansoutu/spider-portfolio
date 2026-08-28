@@ -25,6 +25,12 @@ import { useEffect, useRef } from "react";
  * O andar é feito de trechos: escolhe um ponto, caminha até ele, para alguns
  * segundos, escolhe outro. Movimento contínuo e uniforme lê como ícone
  * deslizando; a pausa é o que lê como bicho.
+ *
+ * ENTRADA (opcional, via `descer`): em vez de já estar na tela, a aranha desce
+ * do alto pendurada num fio, de cabeça para baixo, freia, balança um pouco e
+ * então solta o fio e sai andando. São duas fases no mesmo laço, e o giro de
+ * 180° para a direção da caminhada acontece sozinho — o suavizador de ângulo
+ * que já existia trata a virada como trataria qualquer outra.
  */
 
 const PAUSA_MIN = 1400;
@@ -32,15 +38,28 @@ const PAUSA_MAX = 4200;
 /** Folga para ela não encostar nas bordas da seção. */
 const MARGEM = 40;
 
+/** Quanto dura a descida no fio, e quanto tempo ela fica pendurada depois. */
+const DESCIDA_MS = 2400;
+const PENDURADA_MS = 1100;
+/** O fio some neste tempo depois que ela solta. */
+const FIO_SOME_MS = 500;
+
 export function WalkingSpider({
   tamanho = 22,
   /** Pixels por segundo. Aranha correndo vira praga; devagar vira detalhe. */
   velocidade = 42,
+  /** Entra descendo por um fio, de cabeça para baixo, em vez de já estar lá. */
+  descer = false,
+  /** Espera antes de começar a descer. Serve para não descer atrás da cortina. */
+  atrasoMs = 0,
 }: {
   tamanho?: number;
   velocidade?: number;
+  descer?: boolean;
+  atrasoMs?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const fioRef = useRef<HTMLDivElement>(null);
 
   /*
    * Posição e destino moram em refs, e não em variáveis do efeito.
@@ -54,6 +73,12 @@ export function WalkingSpider({
   const alvo = useRef<{ x: number; y: number } | null>(null);
   const angulo = useRef(0);
   const paradaAte = useRef(0);
+  /** "descendo" | "pendurada" | "andando" — a entrada é uma fase à parte. */
+  const fase = useRef<"descendo" | "pendurada" | "andando">(
+    descer ? "descendo" : "andando",
+  );
+  const inicioDescida = useRef(0);
+  const soltouEm = useRef(0);
 
   useEffect(() => {
     const el = ref.current;
@@ -76,12 +101,90 @@ export function WalkingSpider({
     if (!pos.current) pos.current = sortear();
     if (!alvo.current) alvo.current = sortear();
 
+    /*
+     * Quem desce começa fora da tela, e o destino da descida fica na metade de
+     * cima da seção — descer até o rodapé do hero seria um fio comprido demais
+     * e uma queda que dura mais que a paciência de quem chegou.
+     */
+    if (descer && fase.current === "descendo") {
+      const { width, height } = area.getBoundingClientRect();
+      alvo.current = {
+        x: MARGEM + Math.random() * Math.max(1, width - MARGEM * 2),
+        y: height * (0.25 + Math.random() * 0.25),
+      };
+      pos.current = { x: alvo.current.x, y: -tamanho };
+    }
+
     const passo = (agora: number) => {
       const dt = Math.min((agora - ultimo) / 1000, 0.05);
       ultimo = agora;
 
       const p = pos.current!;
       const a = alvo.current!;
+
+      /*
+       * ENTRADA: descendo pelo fio.
+       *
+       * A curva é uma cúbica de saída — rápida no começo, freando no fim. É o
+       * que faz parecer peso caindo e sendo segurado, e não um objeto
+       * deslizando a velocidade constante.
+       *
+       * O balanço no fim é uma senoide que se apaga (`Math.exp`), como
+       * qualquer coisa pendurada que para de balançar sozinha.
+       */
+      if (fase.current !== "andando") {
+        if (!inicioDescida.current) inicioDescida.current = agora + atrasoMs;
+        if (agora < inicioDescida.current) {
+          el.style.opacity = "0";
+          raf = requestAnimationFrame(passo);
+          return;
+        }
+        el.style.opacity = "1";
+
+        const t = Math.min(1, (agora - inicioDescida.current) / DESCIDA_MS);
+        const suave = 1 - Math.pow(1 - t, 3);
+        const y = -tamanho + (a.y + tamanho) * suave;
+
+        /* O balanço só existe depois de ela chegar. */
+        const descanso = Math.max(
+          0,
+          (agora - inicioDescida.current - DESCIDA_MS) / 1000,
+        );
+        const balanco =
+          t < 1 ? 0 : Math.sin(descanso * 5.2) * 7 * Math.exp(-descanso * 1.6);
+
+        p.x = a.x + balanco;
+        p.y = y;
+        /* De cabeça para baixo, com o corpo acompanhando o balanço. */
+        angulo.current = 180 + balanco * 0.6;
+
+        if (fioRef.current) {
+          fioRef.current.style.transform = `translate3d(${a.x}px, 0, 0)`;
+          /*
+           * O fio vai até o CENTRO da aranha. O último pedaço fica escondido
+           * atrás do abdome, que é opaco — e é assim que se lê como preso a
+           * ela, e não como uma linha que para pouco antes.
+           */
+          fioRef.current.style.height = `${Math.max(0, y)}px`;
+          fioRef.current.style.opacity = "1";
+        }
+
+        if (t >= 1 && fase.current === "descendo") {
+          fase.current = "pendurada";
+          soltouEm.current = agora + PENDURADA_MS;
+        }
+
+        if (fase.current === "pendurada" && agora >= soltouEm.current) {
+          fase.current = "andando";
+          alvo.current = sortear();
+          if (fioRef.current) fioRef.current.style.opacity = "0";
+        }
+
+        el.style.transform = `translate3d(${p.x}px, ${p.y}px, 0) rotate(${angulo.current}deg)`;
+        el.dataset.andando = "false";
+        raf = requestAnimationFrame(passo);
+        return;
+      }
 
       if (agora >= paradaAte.current) {
         const dx = a.x - p.x;
@@ -139,7 +242,7 @@ export function WalkingSpider({
      */
     const io = new IntersectionObserver(
       ([entrada]) => (entrada?.isIntersecting ? ligar() : desligar()),
-      { threshold: 0 }
+      { threshold: 0 },
     );
     io.observe(area);
 
@@ -164,38 +267,80 @@ export function WalkingSpider({
   }, [velocidade]);
 
   return (
-    <div
-      ref={ref}
-      aria-hidden="true"
-      className="spider pointer-events-none absolute top-0 left-0 print:hidden"
-      style={{ willChange: "transform" }}
-    >
-      <svg
-        width={tamanho}
-        height={tamanho}
-        viewBox="-24 -24 48 48"
-        fill="none"
-        stroke="white"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-        className="-translate-x-1/2 -translate-y-1/2 drop-shadow-[0_0_5px_rgba(255,255,255,0.45)]"
-      >
-        {/* Pernas da esquerda e da direita em fases opostas — é o que faz o
-            movimento parecer caminhada e não deslize. */}
-        <g className="spider-legs-l">
-          <path d="M-4 -3 L-13 -12 L-18 -16" />
-          <path d="M-5 -1 L-16 -4 L-21 -6" />
-          <path d="M-5 2 L-16 5 L-20 9" />
-          <path d="M-4 4 L-12 11 L-15 16" />
-        </g>
-        <g className="spider-legs-r">
-          <path d="M4 -3 L13 -12 L18 -16" />
-          <path d="M5 -1 L16 -4 L21 -6" />
-          <path d="M5 2 L16 5 L20 9" />
-          <path d="M4 4 L12 11 L15 16" />
-        </g>
+    <>
+      {/*
+       * O fio. Nasce no topo da seção e termina onde a aranha está — a altura
+       * é escrita a cada quadro, junto com a posição dela.
+       *
+       * O degradê existe porque um fio de opacidade constante lê como uma
+       * linha desenhada; seda de verdade quase some perto da âncora e ganha
+       * corpo perto do peso.
+       */}
+      {descer && (
+        <div
+          ref={fioRef}
+          aria-hidden="true"
+          className="pointer-events-none absolute top-0 left-0 w-px origin-top transition-opacity print:hidden"
+          style={{
+            height: 0,
+            opacity: 0,
+            transitionDuration: `${FIO_SOME_MS}ms`,
+            background:
+              "linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0.45))",
+          }}
+        />
+      )}
 
-        {/*
+      {/*
+       * A centralização é feita por MARGEM, e não por transformação.
+       *
+       * O SVG era centralizado com `-translate-x-1/2 -translate-y-1/2` dentro
+       * desta div — e a div gira. Ao virar de cabeça para baixo, aquele
+       * deslocamento de -12,-12 virava +12,+12: a aranha era atirada 24px para
+       * baixo e para a direita da ponta do fio, e ficava pendurada AO LADO da
+       * teia em vez de nela.
+       *
+       * Margem negativa é layout, não transformação: ela já deixa a caixa
+       * centrada no ponto de ancoragem antes de qualquer giro, e a rotação
+       * passa a acontecer em torno do próprio corpo do bicho. O fio e a aranha
+       * ficam presos em qualquer ângulo.
+       */}
+      <div
+        ref={ref}
+        aria-hidden="true"
+        className="spider pointer-events-none absolute top-0 left-0 print:hidden"
+        style={{
+          willChange: "transform",
+          marginLeft: -tamanho / 2,
+          marginTop: -tamanho / 2,
+        }}
+      >
+        <svg
+          width={tamanho}
+          height={tamanho}
+          viewBox="-24 -24 48 48"
+          fill="none"
+          stroke="white"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+          className="drop-shadow-[0_0_5px_rgba(255,255,255,0.45)]"
+        >
+          {/* Pernas da esquerda e da direita em fases opostas — é o que faz o
+            movimento parecer caminhada e não deslize. */}
+          <g className="spider-legs-l">
+            <path d="M-4 -3 L-13 -12 L-18 -16" />
+            <path d="M-5 -1 L-16 -4 L-21 -6" />
+            <path d="M-5 2 L-16 5 L-20 9" />
+            <path d="M-4 4 L-12 11 L-15 16" />
+          </g>
+          <g className="spider-legs-r">
+            <path d="M4 -3 L13 -12 L18 -16" />
+            <path d="M5 -1 L16 -4 L21 -6" />
+            <path d="M5 2 L16 5 L20 9" />
+            <path d="M4 4 L12 11 L15 16" />
+          </g>
+
+          {/*
           Abdome e cefalotórax, preenchidos para o bicho ter corpo.
 
           A listra preta cruza o abdome NA HORIZONTAL, pelo meio. É uma elipse
@@ -204,10 +349,11 @@ export function WalkingSpider({
           duas vezes na página vira id duplicado, que é HTML inválido e faz o
           navegador escolher sozinho a qual dos dois cada referência aponta.
         */}
-        <ellipse cx="0" cy="4.5" rx="5.2" ry="7" fill="white" stroke="none" />
-        <ellipse cx="0" cy="4.5" rx="5" ry="1.5" fill="black" stroke="none" />
-        <circle cx="0" cy="-3.5" r="3.6" fill="white" stroke="none" />
-      </svg>
-    </div>
+          <ellipse cx="0" cy="4.5" rx="5.2" ry="7" fill="white" stroke="none" />
+          <ellipse cx="0" cy="4.5" rx="5" ry="1.5" fill="black" stroke="none" />
+          <circle cx="0" cy="-3.5" r="3.6" fill="white" stroke="none" />
+        </svg>
+      </div>
+    </>
   );
 }

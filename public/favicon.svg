@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Aranha">
+  <!--
+    O ícone do site.
+
+    Aranha preta sobre o vermelho do portfólio, e não o contrário. Três razões,
+    todas medidas desenhando as duas versões e olhando em 16px, que é o tamanho
+    em que um favicon realmente vive:
+
+      1. Em 16px a versão escura com teia virava uma mancha cinza. Os fios que
+         funcionam no fundo do site somem nessa escala e só sujam a silhueta.
+      2. Vermelho cheio se destaca numa barra de abas, que é feita de ícones
+         brancos e azuis. Chamar atenção ali é a função do ícone.
+      3. Preto sobre vermelho tem mais contraste que branco sobre preto, e é o
+         contraste que sobrevive à redução.
+
+    O corpo é sólido e as pernas são grossas de propósito: qualquer detalhe fino
+    aqui é perdido no primeiro downscale.
+  -->
+  <rect width="64" height="64" rx="13" fill="#e23b30"/>
+  <g stroke="#0a0a0a" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M25 25 L13 14"/><path d="M23 31 L9 28"/><path d="M23 38 L9 46"/><path d="M26 43 L15 54"/>
+    <path d="M39 25 L51 14"/><path d="M41 31 L55 28"/><path d="M41 38 L55 46"/><path d="M38 43 L49 54"/>
+  </g>
+  <ellipse cx="32" cy="39" rx="11.5" ry="14" fill="#0a0a0a"/>
+  <circle cx="32" cy="23" r="8" fill="#0a0a0a"/>
+</svg>
