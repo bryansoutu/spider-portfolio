@@ -6,10 +6,6 @@ import { useLocale } from "@/lib/locale";
 import type { Project } from "@/lib/types";
 import { Section } from "./Section";
 
-import nyoDesktop from "@/assets/projects/nyo-desktop.webp";
-import nyoMobile from "@/assets/projects/nyo-mobile.webp";
-import meteorosDesktop from "@/assets/projects/meteoros-desktop.webp";
-import meteorosMobile from "@/assets/projects/meteoros-mobile.webp";
 
 /**
  * Projetos.
@@ -38,9 +34,62 @@ import meteorosMobile from "@/assets/projects/meteoros-mobile.webp";
  * tem para onde mandar ninguém; este portfólio está no ar mas linkar para ele
  * mesmo seria um círculo.
  */
-const SHOTS: Record<string, { wide: string; tall: string }> = {
-  "nyo-telecom": { wide: nyoDesktop, tall: nyoMobile },
-  meteoros: { wide: meteorosDesktop, tall: meteorosMobile },
+/*
+ * As capturas, em todas as larguras geradas por `npm run images`.
+ *
+ * O `import.meta.glob` evita dezoito linhas de import — são quatro imagens em
+ * três ou quatro tamanhos cada — e mantém o hash de conteúdo no nome do
+ * arquivo, que é o que permite o cache eterno em `/assets`.
+ *
+ * Só a pasta `responsivo/` entra. Os arquivos de 1600px ao lado continuam no
+ * repositório como FONTE, e ficam de fora do pacote justamente por não serem
+ * importados por ninguém.
+ */
+const CAPTURAS = import.meta.glob("../assets/projects/responsivo/*.webp", {
+  eager: true,
+  query: "?url",
+  import: "default",
+}) as Record<string, string>;
+
+function conjunto(base: string, larguras: number[]) {
+  const url = (largura: number) => {
+    const chave = Object.keys(CAPTURAS).find((k) => k.endsWith(`/${base}-${largura}.webp`));
+    if (!chave) {
+      throw new Error(`captura ausente: ${base}-${largura}.webp — rode npm run images`);
+    }
+    return CAPTURAS[chave]!;
+  };
+
+  return {
+    /* O `src` é a MENOR: é o que navegador antigo, sem srcset, vai buscar. */
+    src: url(larguras[0]!),
+    srcSet: larguras.map((l) => `${url(l)} ${l}w`).join(", "),
+  };
+}
+
+const LARGURAS_WIDE = [480, 640, 960, 1400];
+const LARGURAS_TALL = [320, 480, 640];
+
+/*
+ * `sizes` diz ao navegador quanto ESPAÇO a imagem vai ocupar, antes de o CSS
+ * existir — é com isso que ele escolhe a largura certa do `srcset`. Errar aqui
+ * é pior que não ter srcset nenhum: ele baixa a versão errada com convicção.
+ *
+ * O cartão em destaque põe a captura numa coluna de ~1,15/2,15 da faixa a
+ * partir de 1024px; abaixo disso ela ocupa a largura toda.
+ */
+const SIZES_WIDE = "(min-width: 1280px) 660px, (min-width: 1024px) 52vw, 100vw";
+const SIZES_TALL = "(min-width: 640px) 320px, 100vw";
+
+const SHOTS: Record<string, { wide: ReturnType<typeof conjunto>; tall: ReturnType<typeof conjunto> }> = {
+  "nyo-telecom": {
+    wide: conjunto("nyo-desktop", LARGURAS_WIDE),
+    tall: conjunto("nyo-mobile", LARGURAS_TALL),
+  },
+  meteoros: {
+    wide: conjunto("meteoros-desktop", LARGURAS_WIDE),
+    tall: conjunto("meteoros-mobile", LARGURAS_TALL),
+  },
 };
 
 /** O `+` que gira 45° e vira `×` ao abrir. */
@@ -99,9 +148,14 @@ function CartaoDestaque({ project }: { project: Project }) {
             className="relative block overflow-hidden border-b border-border lg:border-b-0 lg:border-r"
           >
             <img
-              src={shots.wide}
+              src={shots.wide.src}
+              srcSet={shots.wide.srcSet}
+              sizes={SIZES_WIDE}
+              width={1400}
+              height={875}
               alt=""
               loading="lazy"
+              decoding="async"
               className="aspect-[16/10] w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]"
             />
             {/*
@@ -174,9 +228,14 @@ function CartaoDestaque({ project }: { project: Project }) {
           {shots && (
             <figure className="mt-8">
               <img
-                src={shots.tall}
+                src={shots.tall.src}
+                srcSet={shots.tall.srcSet}
+                sizes={SIZES_TALL}
+                width={640}
+                height={1385}
                 alt=""
                 loading="lazy"
+                decoding="async"
                 className="max-h-[420px] w-full border border-border object-cover object-top sm:max-w-xs"
               />
               <figcaption className="label-sm mt-3 text-muted-foreground/70">

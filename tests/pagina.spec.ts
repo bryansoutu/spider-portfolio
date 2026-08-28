@@ -281,3 +281,37 @@ test("o link compartilhado leva a marca do Bryan, não a da hospedagem", async (
   expect(r.headers()["content-type"]).toContain("image/png");
   expect((await r.body()).length).toBeGreaterThan(20_000);
 });
+
+test("as capturas são servidas no tamanho da tela, não no maior", async ({ page }) => {
+  /*
+   * Otimização de 28/08. As capturas têm 1600×1000 e aparecem num cartão de
+   * ~660px: um celular baixava 1600px de imagem para desenhar 390. O Lighthouse
+   * apontava 272 KiB de desperdício, o maior item da lista dele.
+   *
+   * O teste não mede peso — mede a CONDIÇÃO para o navegador economizar: que
+   * exista `srcset` com várias larguras e um `sizes` dizendo quanto espaço a
+   * imagem ocupa. Sem `sizes` correto ele baixa a versão errada com convicção,
+   * o que é pior que não ter srcset nenhum.
+   */
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/?lang=pt-BR");
+  await page.locator("#projetos").scrollIntoViewIfNeeded();
+
+  const img = page.locator("#projetos > ul").first().locator("li").first().locator("img").first();
+
+  const srcset = (await img.getAttribute("srcset")) ?? "";
+  const larguras = [...srcset.matchAll(/(\d+)w/g)].map((m) => Number(m[1]));
+
+  expect(larguras.length, "srcset precisa oferecer várias larguras").toBeGreaterThanOrEqual(3);
+  expect(Math.min(...larguras)).toBeLessThanOrEqual(640);
+  expect(await img.getAttribute("sizes")).toBeTruthy();
+
+  /* Dimensões declaradas reservam o espaço e evitam o pulo de layout. */
+  expect(await img.getAttribute("width")).toBeTruthy();
+  expect(await img.getAttribute("height")).toBeTruthy();
+  expect(await img.getAttribute("loading")).toBe("lazy");
+
+  /* E o que o navegador escolheu de fato não pode ser a maior de todas. */
+  const escolhida = await img.evaluate((el: HTMLImageElement) => el.currentSrc);
+  expect(escolhida).not.toContain(`-${Math.max(...larguras)}.`);
+});

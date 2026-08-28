@@ -12,7 +12,7 @@
  * 768px e não 640: cobre tela retina com folga e ainda sobra para o leve zoom
  * do hover, sem chegar perto do peso do original.
  */
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { statSync } from "node:fs";
 import { join } from "node:path";
 import sharp from "sharp";
@@ -40,3 +40,62 @@ for (const { from, to, size } of TARGETS) {
     `✓ ${from} → ${to}  ${(before / 1024).toFixed(0)} KB → ${(buffer.length / 1024).toFixed(0)} KB`
   );
 }
+
+/*
+ * ---------------------------------------------------------------------------
+ * Capturas dos projetos, em várias larguras.
+ *
+ * As capturas têm 1600×1000 e aparecem num cartão de ~660px. Num celular, o
+ * navegador baixava 1600px de imagem para desenhar 390 — o Lighthouse apontava
+ * 272 KiB de desperdício, e era o maior item da lista.
+ *
+ * Aqui não há uma "melhor largura": depende da tela de quem chega. Então saem
+ * várias, e o `srcset` no componente deixa o NAVEGADOR escolher, que é quem
+ * sabe a largura da janela e a densidade da tela. Numa tela retina de celular
+ * ele pega a de 960; num monitor comum, a de 640.
+ *
+ * Os arquivos de 1600px continuam no repositório como fonte, e não são
+ * importados por código nenhum — é deles que estes derivados nascem.
+ * ---------------------------------------------------------------------------
+ */
+const RESPONSIVAS = [
+  { arquivo: "nyo-desktop.webp", larguras: [480, 640, 960, 1400] },
+  { arquivo: "meteoros-desktop.webp", larguras: [480, 640, 960, 1400] },
+  { arquivo: "nyo-mobile.webp", larguras: [320, 480, 640] },
+  { arquivo: "meteoros-mobile.webp", larguras: [320, 480, 640] },
+];
+
+const ORIGEM = join(ASSETS, "projects");
+const DESTINO = join(ORIGEM, "responsivo");
+await mkdir(DESTINO, { recursive: true });
+
+let antes = 0;
+let depois = 0;
+
+for (const { arquivo, larguras } of RESPONSIVAS) {
+  const base = arquivo.replace(/\.webp$/, "");
+  const entrada = await readFile(join(ORIGEM, arquivo));
+  antes += statSync(join(ORIGEM, arquivo)).size;
+
+  const partes = [];
+  for (const largura of larguras) {
+    const buffer = await sharp(entrada)
+      .resize(largura, null, { withoutEnlargement: true })
+      .webp({ quality: 82, effort: 6 })
+      .toBuffer();
+
+    await writeFile(join(DESTINO, `${base}-${largura}.webp`), buffer);
+    depois += buffer.length;
+    partes.push(`${largura}px=${(buffer.length / 1024).toFixed(0)}KB`);
+  }
+
+  console.log(`✓ ${arquivo}  →  ${partes.join("  ")}`);
+}
+
+console.log(
+  `
+  originais: ${(antes / 1024).toFixed(0)} KB` +
+    `  ·  derivados somados: ${(depois / 1024).toFixed(0)} KB` +
+    `
+  (o navegador baixa UMA por imagem, não todas)`
+);
